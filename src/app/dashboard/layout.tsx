@@ -40,7 +40,7 @@ export default function DashboardLayout({
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link href="/dashboard" className="text-xl font-bold text-gray-900">
-                TinyEngage
+                TinyEngagement
               </Link>
               <div className="ml-10 flex space-x-8">
                 <Link

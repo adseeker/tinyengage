@@ -1,4 +1,4 @@
-# TinyEngage - Email Survey SaaS MVP
+# TinyEngagement - Email Survey SaaS MVP
 
 A micro SaaS platform for collecting feedback directly in emails with one-click responses.
 
@@ -59,7 +59,7 @@ A micro SaaS platform for collecting feedback directly in emails with one-click 
 ## 🧪 Testing the MVP
 
 ### Test User Credentials
-- **Email:** test@tinyengage.com
+- **Email:** test@tinyengagement.com
 - **Password:** password123
 
 ### Test Flow

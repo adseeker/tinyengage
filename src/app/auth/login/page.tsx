@@ -34,7 +34,7 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Sign In</CardTitle>
           <CardDescription>
-            Welcome back to TinyEngage
+            Welcome back to TinyEngagement
           </CardDescription>
         </CardHeader>
         <CardContent>

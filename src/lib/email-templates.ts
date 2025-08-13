@@ -12,7 +12,7 @@ export function generateEmailHTML(
 
   return `
 <!-- 
-  TinyEngage Email Survey Template
+  TinyEngagement Email Survey Template
   
   IMPORTANT: Before using this template:
   1. Replace 'REPLACE_WITH_SUBSCRIBER_EMAIL' with your email platform's merge tag
@@ -117,7 +117,7 @@ export function generateEmailHTML(
           </tr>
         </table>
         <p style="margin: 20px 0 0 0; font-size: 12px; color: #6b7280; text-align: center;">
-          Powered by TinyEngage
+          Powered by TinyEngagement
         </p>
       </td>
     </tr>
@@ -165,7 +165,7 @@ Please click one of the following links to submit your response:
 ${links}
 
 ---
-Powered by TinyEngage
+Powered by TinyEngagement
 `.trim()
 }
 

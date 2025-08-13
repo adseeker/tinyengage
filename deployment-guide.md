@@ -1,4 +1,4 @@
-# TinyEngage Deployment Guide
+# TinyEngagement Deployment Guide
 
 ## 🚀 Quick Deploy to Vercel
 

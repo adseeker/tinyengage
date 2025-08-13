@@ -60,7 +60,7 @@ function ThankYouContent() {
       
       <div className="absolute bottom-8 text-center w-full">
         <p className="text-sm text-gray-500">
-          Powered by TinyEngage - One-click email surveys
+          Powered by TinyEngagement - One-click email surveys
         </p>
       </div>
     </div>

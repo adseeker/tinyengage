@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'TinyEngage - Email Survey SaaS',
+  title: 'TinyEngagement - Email Survey SaaS',
   description: 'One-click feedback collection directly in emails',
 }
 

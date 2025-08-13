@@ -46,7 +46,7 @@ export default function RegisterPage() {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>
-            Start collecting feedback with TinyEngage
+            Start collecting feedback with TinyEngagement
           </CardDescription>
         </CardHeader>
         <CardContent>

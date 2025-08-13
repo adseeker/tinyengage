@@ -1,8 +1,8 @@
-# CLAUDE.md - TinyEngage Email Survey SaaS Documentation
+# CLAUDE.md - TinyEngagement Email Survey SaaS Documentation
 
 ## 🎯 **Project Overview**
 
-**Name**: TinyEngage
+**Name**: TinyEngagement
 **Type**: Micro SaaS for embedded email surveys
 **Core Value**: One-click feedback collection directly in emails without redirects
 **Status**: ✅ MVP Complete & Production Ready
@@ -582,7 +582,7 @@ NEXT_PUBLIC_BASE_URL=https://your-domain.com
 
 ## 🎯 **FUTURE AGENT GUIDELINES**
 
-### **When Working on TinyEngage:**
+### **When Working on TinyEngagement:**
 1. **ALWAYS run security tests** after any database query changes
 2. **NEVER bypass user_id filtering** in API endpoints
 3. **Test multi-user scenarios** for any new features
@@ -607,7 +607,7 @@ NEXT_PUBLIC_BASE_URL=https://your-domain.com
 
 ## 📝 **CURRENT PROJECT STATUS**
 
-**MVP COMPLETED**: The TinyEngage email survey SaaS is fully functional and production-ready with:
+**MVP COMPLETED**: The TinyEngagement email survey SaaS is fully functional and production-ready with:
 - ✅ Secure multi-user support
 - ✅ Complete survey workflow (create → generate → collect → analyze)
 - ✅ Mobile-optimized email templates
@@ -617,4 +617,4 @@ NEXT_PUBLIC_BASE_URL=https://your-domain.com
 
 **READY FOR**: Public deployment, user testing, feature expansion, integration development.
 
-This specification provides complete guidance for AI coding agents working on the TinyEngage platform. The MVP is production-ready and secure for multi-user deployment.
+This specification provides complete guidance for AI coding agents working on the TinyEngagement platform. The MVP is production-ready and secure for multi-user deployment.
