@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUserByEmail, generateTokens } from '@/lib/auth'
+import { initializeDatabase } from '@/lib/db'
 import { z } from 'zod'
+
+// Initialize database on cold start
+initializeDatabase()
 
 const registerSchema = z.object({
   email: z.string().email(),

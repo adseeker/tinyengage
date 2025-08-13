@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAccessToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { db, initializeDatabase } from '@/lib/db'
 import { CreateSurveyRequest, Survey } from '@/types'
 import { z } from 'zod'
 import crypto from 'crypto'
+
+// Initialize database on cold start
+initializeDatabase()
 
 const createSurveySchema = z.object({
   title: z.string().min(1).max(200),

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyRefreshToken, getUserById, generateTokens } from '@/lib/auth'
+import { initializeDatabase } from '@/lib/db'
+
+// Initialize database on cold start
+initializeDatabase()
 
 export async function POST(request: NextRequest) {
   try {

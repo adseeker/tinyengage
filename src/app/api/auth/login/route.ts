@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUser, generateTokens } from '@/lib/auth'
+import { initializeDatabase } from '@/lib/db'
 import { z } from 'zod'
+
+// Initialize database on cold start
+initializeDatabase()
 
 const loginSchema = z.object({
   email: z.string().email(),
