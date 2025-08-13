@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAccessToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { db, initializeDatabase } from '@/lib/database'
 import { generateEmailPreview } from '@/lib/email-templates'
 import { generateRecipientId } from '@/lib/crypto'
+
+// Initialize database on cold start
+initializeDatabase()
 
 export async function GET(
   request: NextRequest,
@@ -21,7 +24,7 @@ export async function GET(
     }
 
     const { id: surveyId } = await params
-    const survey = getSurveyWithOptions(surveyId, payload.userId)
+    const survey = await getSurveyWithOptions(surveyId, payload.userId)
     if (!survey) {
       return NextResponse.json({ error: 'Survey not found' }, { status: 404 })
     }
@@ -44,21 +47,18 @@ export async function GET(
   }
 }
 
-function getSurveyWithOptions(surveyId: string, userId: string) {
-  const surveyStmt = db.prepare(`
-    SELECT * FROM surveys WHERE id = ? AND user_id = ?
-  `)
+async function getSurveyWithOptions(surveyId: string, userId: string) {
+  const survey = await db.get(`
+    SELECT * FROM surveys WHERE id = $1 AND user_id = $2
+  `, [surveyId, userId])
   
-  const survey = surveyStmt.get(surveyId, userId) as any
   if (!survey) return null
 
-  const optionsStmt = db.prepare(`
+  const options = await db.query(`
     SELECT * FROM survey_options 
-    WHERE survey_id = ? 
+    WHERE survey_id = $1 
     ORDER BY position ASC
-  `)
-  
-  const options = optionsStmt.all(surveyId) as any[]
+  `, [surveyId])
 
   return {
     id: survey.id,
@@ -68,7 +68,7 @@ function getSurveyWithOptions(surveyId: string, userId: string) {
     settings: JSON.parse(survey.settings),
     createdAt: new Date(survey.created_at),
     userId: survey.user_id,
-    options: options.map(option => ({
+    options: options.map((option: any) => ({
       id: option.id,
       label: option.label,
       emoji: option.emoji,

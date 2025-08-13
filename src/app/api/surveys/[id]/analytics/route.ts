@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAccessToken } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { db, initializeDatabase } from '@/lib/database'
+
+// Initialize database on cold start
+initializeDatabase()
 
 export async function GET(
   request: NextRequest,
@@ -20,26 +23,26 @@ export async function GET(
 
     const { id: surveyId } = await params
 
-    const survey = db.prepare(`
-      SELECT * FROM surveys WHERE id = ? AND user_id = ?
-    `).get(surveyId, payload.userId) as any
+    const survey = await db.get(`
+      SELECT * FROM surveys WHERE id = $1 AND user_id = $2
+    `, [surveyId, payload.userId])
 
     if (!survey) {
       return NextResponse.json({ error: 'Survey not found' }, { status: 404 })
     }
 
-    const totalResponses = db.prepare(`
-      SELECT COUNT(*) as count FROM responses WHERE survey_id = ?
-    `).get(surveyId) as any
+    const totalResponses = await db.get(`
+      SELECT COUNT(*) as count FROM responses WHERE survey_id = $1
+    `, [surveyId])
 
-    const humanResponses = db.prepare(`
+    const humanResponses = await db.get(`
       SELECT COUNT(*) as count 
       FROM responses r 
       JOIN bot_scores bs ON r.id = bs.response_id 
-      WHERE r.survey_id = ? AND bs.score < 50
-    `).get(surveyId) as any
+      WHERE r.survey_id = $1 AND bs.score < 50
+    `, [surveyId])
 
-    const responsesByOption = db.prepare(`
+    const responsesByOption = await db.query(`
       SELECT 
         so.id,
         so.label,
@@ -48,45 +51,45 @@ export async function GET(
         COUNT(r.id) as count
       FROM survey_options so
       LEFT JOIN responses r ON so.id = r.option_id
-      WHERE so.survey_id = ?
+      WHERE so.survey_id = $1
       GROUP BY so.id, so.label, so.emoji, so.color
       ORDER BY so.position ASC
-    `).all(surveyId) as any[]
+    `, [surveyId])
 
-    const responsesByDay = db.prepare(`
+    const responsesByDay = await db.query(`
       SELECT 
         DATE(created_at) as date,
         COUNT(*) as count
       FROM responses
-      WHERE survey_id = ?
+      WHERE survey_id = $1
       GROUP BY DATE(created_at)
       ORDER BY date DESC
       LIMIT 30
-    `).all(surveyId) as any[]
+    `, [surveyId])
 
-    const responsesByHour = db.prepare(`
+    const responsesByHour = await db.query(`
       SELECT 
-        strftime('%H', created_at) as hour,
+        EXTRACT(HOUR FROM created_at) as hour,
         COUNT(*) as count
       FROM responses
-      WHERE survey_id = ? AND DATE(created_at) = DATE('now')
-      GROUP BY strftime('%H', created_at)
+      WHERE survey_id = $1 AND DATE(created_at) = CURRENT_DATE
+      GROUP BY EXTRACT(HOUR FROM created_at)
       ORDER BY hour ASC
-    `).all(surveyId) as any[]
+    `, [surveyId])
 
-    const recentResponses = db.prepare(`
+    const recentResponses = await db.query(`
       SELECT 
         r.id,
         r.created_at,
         so.label as option_label,
         so.emoji as option_emoji,
-        JSON_EXTRACT(r.metadata, '$.isBot') as is_bot
+        (r.metadata::json->>'isBot')::boolean as is_bot
       FROM responses r
       JOIN survey_options so ON r.option_id = so.id
-      WHERE r.survey_id = ?
+      WHERE r.survey_id = $1
       ORDER BY r.created_at DESC
       LIMIT 50
-    `).all(surveyId) as any[]
+    `, [surveyId])
 
     const analytics = {
       survey: {
@@ -96,31 +99,31 @@ export async function GET(
         createdAt: survey.created_at
       },
       metrics: {
-        totalResponses: totalResponses.count,
-        humanResponses: humanResponses.count,
-        botResponses: totalResponses.count - humanResponses.count,
-        responseRate: totalResponses.count > 0 ? (humanResponses.count / totalResponses.count * 100).toFixed(1) : '0'
+        totalResponses: parseInt(totalResponses.count) || 0,
+        humanResponses: parseInt(humanResponses.count) || 0,
+        botResponses: (parseInt(totalResponses.count) || 0) - (parseInt(humanResponses.count) || 0),
+        responseRate: (parseInt(totalResponses.count) || 0) > 0 ? ((parseInt(humanResponses.count) || 0) / (parseInt(totalResponses.count) || 0) * 100).toFixed(1) : '0'
       },
       charts: {
-        responsesByOption: responsesByOption.map(row => ({
+        responsesByOption: responsesByOption.map((row: any) => ({
           id: row.id,
           label: row.label,
           emoji: row.emoji,
           color: row.color,
-          count: row.count,
-          percentage: totalResponses.count > 0 ? (row.count / totalResponses.count * 100).toFixed(1) : '0'
+          count: parseInt(row.count) || 0,
+          percentage: (parseInt(totalResponses.count) || 0) > 0 ? ((parseInt(row.count) || 0) / (parseInt(totalResponses.count) || 0) * 100).toFixed(1) : '0'
         })),
         responsesByDay: responsesByDay.reverse(),
         responsesByHour
       },
-      recentResponses: recentResponses.map(row => ({
+      recentResponses: recentResponses.map((row: any) => ({
         id: row.id,
         createdAt: row.created_at,
         option: {
           label: row.option_label,
           emoji: row.option_emoji
         },
-        isBot: row.is_bot === 1
+        isBot: row.is_bot === true
       }))
     }
 
