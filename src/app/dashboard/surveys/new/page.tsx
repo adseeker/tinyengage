@@ -26,7 +26,7 @@ export default function NewSurveyPage() {
       template.options.map((option, index) => ({
         id: `option_${index}`,
         label: option.label,
-        emoji: option.emoji || undefined,
+        emoji: 'emoji' in option ? option.emoji : undefined,
         value: option.value,
         color: option.color
       }))
@@ -145,7 +145,7 @@ export default function NewSurveyPage() {
                         className="text-lg"
                         title={option.label}
                       >
-                        {option.emoji || option.label}
+                        {'emoji' in option ? option.emoji : option.label}
                       </span>
                     ))}
                     {template.options.length > 5 && (
