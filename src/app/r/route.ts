@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifySignedToken } from '@/lib/crypto'
 import { calculateBotScore, getTotalBotScore, isLikelyBot } from '@/lib/bot-detection'
-import { db } from '@/lib/db'
+import { db, initializeDatabase } from '@/lib/database'
 import crypto from 'crypto'
+
+// Initialize database on cold start
+initializeDatabase()
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -21,7 +24,7 @@ export async function GET(request: NextRequest) {
   const ip = getClientIP(request)
   const responseTime = Date.now()
 
-  const existingResponse = checkExistingResponse(
+  const existingResponse = await checkExistingResponse(
     signedToken.sid,
     signedToken.rid
   )
@@ -46,12 +49,7 @@ export async function GET(request: NextRequest) {
   const responseId = crypto.randomUUID()
 
   try {
-    db.transaction(() => {
-      const insertResponse = db.prepare(`
-        INSERT INTO responses (id, survey_id, recipient_id, option_id, metadata)
-        VALUES (?, ?, ?, ?, ?)
-      `)
-
+    await db.transaction(async () => {
       const metadata = {
         userAgent,
         ipAddress: ip,
@@ -60,41 +58,40 @@ export async function GET(request: NextRequest) {
         botScore: totalScore
       }
 
-      insertResponse.run(
+      await db.run(`
+        INSERT INTO responses (id, survey_id, recipient_id, option_id, metadata)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [
         responseId,
         signedToken.sid,
         signedToken.rid,
         signedToken.ans,
         JSON.stringify(metadata)
-      )
+      ])
 
-      const insertEvent = db.prepare(`
+      await db.run(`
         INSERT INTO response_events (id, response_id, event_type, ip_address, user_agent)
-        VALUES (?, ?, ?, ?, ?)
-      `)
-
-      insertEvent.run(
+        VALUES ($1, $2, $3, $4, $5)
+      `, [
         crypto.randomUUID(),
         responseId,
         'response_submitted',
         ip,
         userAgent
-      )
+      ])
 
-      const insertBotScore = db.prepare(`
+      await db.run(`
         INSERT INTO bot_scores (response_id, score, factors)
-        VALUES (?, ?, ?)
-      `)
-
-      insertBotScore.run(
+        VALUES ($1, $2, $3)
+      `, [
         responseId,
         totalScore,
         JSON.stringify(botScore)
-      )
-    })()
+      ])
+    })
 
-    const survey = getSurveyById(signedToken.sid)
-    const option = getOptionById(signedToken.ans)
+    const survey = await getSurveyById(signedToken.sid)
+    const option = await getOptionById(signedToken.ans)
 
     return NextResponse.redirect(
       new URL(
@@ -124,28 +121,22 @@ function getClientIP(request: NextRequest): string {
   return '127.0.0.1'
 }
 
-function checkExistingResponse(surveyId: string, recipientId: string) {
-  const stmt = db.prepare(`
+async function checkExistingResponse(surveyId: string, recipientId: string) {
+  return await db.get(`
     SELECT id FROM responses 
-    WHERE survey_id = ? AND recipient_id = ?
+    WHERE survey_id = $1 AND recipient_id = $2
     LIMIT 1
-  `)
-  
-  return stmt.get(surveyId, recipientId)
+  `, [surveyId, recipientId])
 }
 
-function getSurveyById(surveyId: string) {
-  const stmt = db.prepare(`
-    SELECT * FROM surveys WHERE id = ?
-  `)
-  
-  return stmt.get(surveyId)
+async function getSurveyById(surveyId: string) {
+  return await db.get(`
+    SELECT * FROM surveys WHERE id = $1
+  `, [surveyId])
 }
 
-function getOptionById(optionId: string) {
-  const stmt = db.prepare(`
-    SELECT * FROM survey_options WHERE id = ?
-  `)
-  
-  return stmt.get(optionId) as any
+async function getOptionById(optionId: string) {
+  return await db.get(`
+    SELECT * FROM survey_options WHERE id = $1
+  `, [optionId])
 }
