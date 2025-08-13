@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyRefreshToken, getUserById, generateTokens } from '@/lib/auth'
-import { initializeDatabase } from '@/lib/db'
+import { initializeDatabase } from '@/lib/database'
 
 // Initialize database on cold start
 initializeDatabase()
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const user = getUserById(payload.userId)
+    const user = await getUserById(payload.userId)
     if (!user) {
       return NextResponse.json(
         { error: 'User not found' },

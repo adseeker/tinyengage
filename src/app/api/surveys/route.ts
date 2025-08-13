@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { verifyAccessToken } from '@/lib/auth'
-import { db, initializeDatabase } from '@/lib/db'
+import { db, initializeDatabase } from '@/lib/database'
 import { CreateSurveyRequest, Survey } from '@/types'
 import { z } from 'zod'
 import crypto from 'crypto'
@@ -45,41 +45,39 @@ export async function POST(request: NextRequest) {
     const surveyId = crypto.randomUUID()
     const settings = surveyData.settings || {}
 
-    db.transaction(() => {
-      const insertSurvey = db.prepare(`
+    await db.transaction(async () => {
+      await db.run(`
         INSERT INTO surveys (id, user_id, title, description, type, settings)
-        VALUES (?, ?, ?, ?, ?, ?)
-      `)
-
-      insertSurvey.run(
+        VALUES ($1, $2, $3, $4, $5, $6)
+      `, [
         surveyId,
         payload.userId,
         surveyData.title,
         surveyData.description || null,
         surveyData.type,
         JSON.stringify(settings)
-      )
+      ])
 
-      const insertOption = db.prepare(`
-        INSERT INTO survey_options (id, survey_id, label, value, emoji, color, position)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-
-      surveyData.options.forEach((option, index) => {
+      for (let i = 0; i < surveyData.options.length; i++) {
+        const option = surveyData.options[i]
         const optionId = crypto.randomUUID()
-        insertOption.run(
+        
+        await db.run(`
+          INSERT INTO survey_options (id, survey_id, label, value, emoji, color, position)
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `, [
           optionId,
           surveyId,
           option.label,
           typeof option.value === 'string' ? option.value : option.value.toString(),
           option.emoji || null,
           option.color || null,
-          index
-        )
-      })
-    })()
+          i
+        ])
+      }
+    })
 
-    const survey = getSurveyById(surveyId)
+    const survey = await getSurveyById(surveyId)
     return NextResponse.json(survey)
 
   } catch (error) {
@@ -111,18 +109,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const stmt = db.prepare(`
+    const rows = await db.query(`
       SELECT s.*, COUNT(r.id) as response_count
       FROM surveys s
       LEFT JOIN responses r ON s.id = r.survey_id
-      WHERE s.user_id = ?
-      GROUP BY s.id
+      WHERE s.user_id = $1
+      GROUP BY s.id, s.title, s.description, s.type, s.settings, s.created_at, s.user_id
       ORDER BY s.created_at DESC
-    `)
-
-    const rows = stmt.all(payload.userId) as any[]
+    `, [payload.userId])
     
-    const surveys = rows.map(row => ({
+    const surveys = await Promise.all(rows.map(async (row: any) => ({
       id: row.id,
       title: row.title,
       description: row.description,
@@ -130,9 +126,9 @@ export async function GET(request: NextRequest) {
       settings: JSON.parse(row.settings),
       createdAt: new Date(row.created_at),
       userId: row.user_id,
-      responseCount: row.response_count,
-      options: getSurveyOptions(row.id)
-    }))
+      responseCount: parseInt(row.response_count) || 0,
+      options: await getSurveyOptions(row.id)
+    })))
 
     return NextResponse.json({ surveys })
 
@@ -145,12 +141,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function getSurveyById(surveyId: string, userId?: string) {
-  const stmt = db.prepare(`
-    SELECT * FROM surveys WHERE id = ?${userId ? ' AND user_id = ?' : ''}
-  `)
+async function getSurveyById(surveyId: string, userId?: string) {
+  const survey = await db.get(`
+    SELECT * FROM surveys WHERE id = $1${userId ? ' AND user_id = $2' : ''}
+  `, userId ? [surveyId, userId] : [surveyId])
   
-  const survey = userId ? stmt.get(surveyId, userId) as any : stmt.get(surveyId) as any
   if (!survey) return null
 
   return {
@@ -161,20 +156,18 @@ function getSurveyById(surveyId: string, userId?: string) {
     settings: JSON.parse(survey.settings),
     createdAt: new Date(survey.created_at),
     userId: survey.user_id,
-    options: getSurveyOptions(surveyId)
+    options: await getSurveyOptions(surveyId)
   }
 }
 
-function getSurveyOptions(surveyId: string) {
-  const stmt = db.prepare(`
+async function getSurveyOptions(surveyId: string) {
+  const rows = await db.query(`
     SELECT * FROM survey_options 
-    WHERE survey_id = ? 
+    WHERE survey_id = $1 
     ORDER BY position ASC
-  `)
+  `, [surveyId])
   
-  const rows = stmt.all(surveyId) as any[]
-  
-  return rows.map(row => ({
+  return rows.map((row: any) => ({
     id: row.id,
     label: row.label,
     emoji: row.emoji,

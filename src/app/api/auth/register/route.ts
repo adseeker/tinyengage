@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUserByEmail, generateTokens } from '@/lib/auth'
-import { initializeDatabase } from '@/lib/db'
+import { initializeDatabase } from '@/lib/database'
 import { z } from 'zod'
 
 // Initialize database on cold start
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, name, password } = registerSchema.parse(body)
 
-    const existingUser = getUserByEmail(email)
+    const existingUser = await getUserByEmail(email)
     if (existingUser) {
       return NextResponse.json(
         { error: 'User already exists' },
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const userId = createUser(email, name, password)
+    const userId = await createUser(email, name, password)
     const { accessToken, refreshToken } = generateTokens({ id: userId, email })
 
     const response = NextResponse.json({

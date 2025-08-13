@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
-import { db } from './db'
+import { db } from './database'
 import { User } from '@/types'
 import crypto from 'crypto'
 
@@ -54,27 +54,25 @@ export function verifyRefreshToken(token: string): { userId: string } | null {
   }
 }
 
-export function createUser(email: string, name: string, password: string): string {
+export async function createUser(email: string, name: string, password: string): Promise<string> {
   const id = crypto.randomUUID()
   const passwordHash = hashPassword(password)
 
-  const stmt = db.prepare(`
+  await db.run(`
     INSERT INTO users (id, email, name, password_hash)
-    VALUES (?, ?, ?, ?)
-  `)
-
-  stmt.run(id, email, name, passwordHash)
+    VALUES ($1, $2, $3, $4)
+  `, [id, email, name, passwordHash])
+  
   return id
 }
 
-export function getUserByEmail(email: string): User | null {
-  const stmt = db.prepare(`
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const row = await db.get(`
     SELECT id, email, name, subscription_tier, created_at
     FROM users
-    WHERE email = ?
-  `)
+    WHERE email = $1
+  `, [email])
 
-  const row = stmt.get(email) as any
   if (!row) return null
 
   return {
@@ -86,14 +84,13 @@ export function getUserByEmail(email: string): User | null {
   }
 }
 
-export function getUserById(id: string): User | null {
-  const stmt = db.prepare(`
+export async function getUserById(id: string): Promise<User | null> {
+  const row = await db.get(`
     SELECT id, email, name, subscription_tier, created_at
     FROM users
-    WHERE id = ?
-  `)
+    WHERE id = $1
+  `, [id])
 
-  const row = stmt.get(id) as any
   if (!row) return null
 
   return {
@@ -105,14 +102,13 @@ export function getUserById(id: string): User | null {
   }
 }
 
-export function authenticateUser(email: string, password: string): User | null {
-  const stmt = db.prepare(`
+export async function authenticateUser(email: string, password: string): Promise<User | null> {
+  const row = await db.get(`
     SELECT id, email, name, password_hash, subscription_tier, created_at
     FROM users
-    WHERE email = ?
-  `)
+    WHERE email = $1
+  `, [email])
 
-  const row = stmt.get(email) as any
   if (!row || !verifyPassword(password, row.password_hash)) {
     return null
   }

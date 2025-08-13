@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { authenticateUser, generateTokens } from '@/lib/auth'
-import { initializeDatabase } from '@/lib/db'
+import { initializeDatabase } from '@/lib/database'
 import { z } from 'zod'
 
 // Initialize database on cold start
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { email, password } = loginSchema.parse(body)
 
-    const user = authenticateUser(email, password)
+    const user = await authenticateUser(email, password)
     if (!user) {
       return NextResponse.json(
         { error: 'Invalid credentials' },
