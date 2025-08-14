@@ -30,7 +30,7 @@ function ThankYouContent() {
           setSurvey(data)
           
           // Inject tracking script if provided
-          if (data.settings.trackingScript) {
+          if (data.settings?.trackingScript) {
             const script = document.createElement('script')
             script.innerHTML = data.settings.trackingScript
             document.head.appendChild(script)
@@ -65,7 +65,7 @@ function ThankYouContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       {/* Tracking Pixel */}
-      {survey?.settings.trackingPixel && (
+      {survey?.settings?.trackingPixel && (
         <Image 
           src={survey.settings.trackingPixel} 
           alt="" 
@@ -88,7 +88,7 @@ function ThankYouContent() {
             <CardDescription>
               {isDuplicate 
                 ? 'You have already responded to this survey.'
-                : survey?.settings.thankYouMessage ||
+                : survey?.settings?.thankYouMessage ||
                   (selectedOption 
                     ? `Your response "${selectedOption}" has been recorded.`
                     : 'Your response has been recorded.'
@@ -119,17 +119,17 @@ function ThankYouContent() {
         </Card>
 
         {/* Follow-up Question */}
-        {!isDuplicate && survey?.settings.followUpQuestion?.enabled && !followUpSubmitted && (
+        {!isDuplicate && survey?.settings?.followUpQuestion?.enabled && !followUpSubmitted && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">One more thing...</CardTitle>
               <CardDescription>
-                {survey.settings.followUpQuestion.question}
+                {survey?.settings?.followUpQuestion?.question}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Textarea
-                placeholder={survey.settings.followUpQuestion.placeholder || "Your thoughts..."}
+                placeholder={survey?.settings?.followUpQuestion?.placeholder || "Your thoughts..."}
                 value={followUpResponse}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFollowUpResponse(e.target.value)}
                 rows={3}
@@ -158,12 +158,12 @@ function ThankYouContent() {
         )}
 
         {/* Upsell Section */}
-        {!isDuplicate && survey?.settings.upsellSection?.enabled && (
+        {!isDuplicate && survey?.settings?.upsellSection?.enabled && (
           <Card className="border-blue-200 bg-blue-50">
             <CardHeader>
-              <CardTitle className="text-lg">{survey.settings.upsellSection.title}</CardTitle>
+              <CardTitle className="text-lg">{survey?.settings?.upsellSection?.title}</CardTitle>
               <CardDescription>
-                {survey.settings.upsellSection.description}
+                {survey?.settings?.upsellSection?.description}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -172,11 +172,11 @@ function ThankYouContent() {
                 className="w-full bg-blue-600 hover:bg-blue-700"
               >
                 <a 
-                  href={survey.settings.upsellSection.ctaUrl} 
+                  href={survey?.settings?.upsellSection?.ctaUrl} 
                   target="_blank" 
                   rel="noopener noreferrer"
                 >
-                  {survey.settings.upsellSection.ctaText}
+                  {survey?.settings?.upsellSection?.ctaText}
                 </a>
               </Button>
             </CardContent>
