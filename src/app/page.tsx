@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function Home() {
   return (
@@ -6,6 +7,15 @@ export default function Home() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/logo.svg" 
+              alt="TinyEngagement Logo" 
+              width={120} 
+              height={120}
+              priority
+            />
+          </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             TinyEngagement
           </h1>

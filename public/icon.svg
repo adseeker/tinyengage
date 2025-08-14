@@ -1,0 +1,5 @@
+<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+  <!-- Simple lightning bolt for small icon -->
+  <path d="M9 2 L6 8 L8 8 L7 14 L10 8 L8 8 Z" 
+        fill="#f59e0b"/>
+</svg>

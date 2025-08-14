@@ -1,0 +1,20 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background (optional, remove if you want transparent) -->
+  <rect width="200" height="200" fill="#f8fafc" rx="8"/>
+  
+  <!-- Lightning bolt positioned under "Tiny" -->
+  <path d="M65 75 L55 95 L65 95 L58 115 L75 90 L65 90 Z" 
+        fill="#f59e0b" 
+        stroke="#d97706" 
+        stroke-width="1"/>
+  
+  <!-- Text: TinyEngagement -->
+  <text x="100" y="130" 
+        font-family="system-ui, -apple-system, sans-serif" 
+        font-size="24" 
+        font-weight="600" 
+        text-anchor="middle" 
+        fill="#1f2937">
+    TinyEngagement
+  </text>
+</svg>

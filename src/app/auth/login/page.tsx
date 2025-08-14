@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -32,6 +33,14 @@ export default function LoginPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
+          <div className="flex justify-center mb-4">
+            <Image 
+              src="/logo.svg" 
+              alt="TinyEngagement Logo" 
+              width={60} 
+              height={60}
+            />
+          </div>
           <CardTitle className="text-2xl">Sign In</CardTitle>
           <CardDescription>
             Welcome back to TinyEngagement
