@@ -157,7 +157,7 @@ export async function GET(request: NextRequest) {
 
 async function getSurveyById(surveyId: string, userId?: string) {
   const survey = await db.get(`
-    SELECT * FROM surveys WHERE id = $1${userId ? ' AND user_id = $2' : ''}
+    SELECT * FROM surveys WHERE id = ?${userId ? ' AND user_id = ?' : ''}
   `, userId ? [surveyId, userId] : [surveyId])
   
   if (!survey) return null
@@ -177,7 +177,7 @@ async function getSurveyById(surveyId: string, userId?: string) {
 async function getSurveyOptions(surveyId: string) {
   const rows = await db.query(`
     SELECT * FROM survey_options 
-    WHERE survey_id = $1 
+    WHERE survey_id = ? 
     ORDER BY position ASC
   `, [surveyId])
   

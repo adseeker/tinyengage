@@ -36,7 +36,7 @@ export async function PATCH(
       UPDATE surveys 
       SET archived = ?
       WHERE id = ? AND user_id = ?
-    `, [archived, surveyId, payload.userId])
+    `, [archived ? 1 : 0, surveyId, payload.userId])
 
     if (result.changes === 0) {
       return NextResponse.json({ error: 'Survey not found' }, { status: 404 })

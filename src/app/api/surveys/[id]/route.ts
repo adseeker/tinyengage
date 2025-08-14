@@ -31,9 +31,10 @@ export async function GET(
         s.type,
         s.settings,
         s.created_at,
-        s.user_id
+        s.user_id,
+        s.archived
       FROM surveys s
-      WHERE s.id = $1 AND s.user_id = $2
+      WHERE s.id = ? AND s.user_id = ?
     `, [surveyId, payload.userId])
 
     if (!survey) {
@@ -44,7 +45,7 @@ export async function GET(
     const options = await db.query(`
       SELECT id, label, value, emoji, color, position
       FROM survey_options
-      WHERE survey_id = $1
+      WHERE survey_id = ?
       ORDER BY position
     `, [surveyId])
 
@@ -105,7 +106,7 @@ export async function PUT(
 
     // Verify survey ownership
     const existingSurvey = await db.get(`
-      SELECT id FROM surveys WHERE id = $1 AND user_id = $2
+      SELECT id FROM surveys WHERE id = ? AND user_id = ?
     `, [surveyId, payload.userId])
 
     if (!existingSurvey) {
@@ -115,8 +116,8 @@ export async function PUT(
     // Update survey
     await db.run(`
       UPDATE surveys 
-      SET title = $1, description = $2, settings = $3
-      WHERE id = $4 AND user_id = $5
+      SET title = ?, description = ?, settings = ?
+      WHERE id = ? AND user_id = ?
     `, [
       title.trim(),
       description || null,
@@ -134,9 +135,10 @@ export async function PUT(
         s.type,
         s.settings,
         s.created_at,
-        s.user_id
+        s.user_id,
+        s.archived
       FROM surveys s
-      WHERE s.id = $1 AND s.user_id = $2
+      WHERE s.id = ? AND s.user_id = ?
     `, [surveyId, payload.userId])
 
     if (!updatedSurvey) {
@@ -147,7 +149,7 @@ export async function PUT(
     const options = await db.query(`
       SELECT id, label, value, emoji, color, position
       FROM survey_options
-      WHERE survey_id = $1
+      WHERE survey_id = ?
       ORDER BY position
     `, [surveyId])
 
@@ -164,7 +166,8 @@ export async function PUT(
       options: options || [],
       settings: parsedSettings,
       createdAt: updatedSurvey.created_at,
-      userId: updatedSurvey.user_id
+      userId: updatedSurvey.user_id,
+      archived: Boolean(updatedSurvey.archived)
     })
 
   } catch (error) {
