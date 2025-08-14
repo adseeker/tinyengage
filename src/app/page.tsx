@@ -11,10 +11,10 @@ export default function Home() {
             <Image 
               src="/logo.svg" 
               alt="TinyEngagement Logo" 
-              width={600} 
-              height={120}
+              width={800} 
+              height={160}
               priority
-              className="h-24 w-auto"
+              className="h-32 w-auto max-w-full"
             />
           </div>
           <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto">
