@@ -118,7 +118,10 @@ export async function GET(request: NextRequest) {
     let whereClause = 'WHERE s.user_id = ?'
     if (archivedOnly) {
       whereClause += ' AND s.archived = 1'
-    } else if (!includeArchived) {
+    } else if (includeArchived) {
+      // Show both archived and non-archived
+    } else {
+      // Default: show only non-archived surveys
       whereClause += ' AND (s.archived = 0 OR s.archived IS NULL)'
     }
 
