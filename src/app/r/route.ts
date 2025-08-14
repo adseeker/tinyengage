@@ -49,46 +49,47 @@ export async function GET(request: NextRequest) {
   const responseId = crypto.randomUUID()
 
   try {
-    await db.transaction(async () => {
-      const metadata = {
-        userAgent,
-        ipAddress: ip,
-        timestamp: new Date().toISOString(),
-        isBot: botLikely,
-        botScore: totalScore
-      }
+    const metadata = {
+      userAgent,
+      ipAddress: ip,
+      timestamp: new Date().toISOString(),
+      isBot: botLikely,
+      botScore: totalScore
+    }
 
-      await db.run(`
-        INSERT INTO responses (id, survey_id, recipient_id, option_id, metadata)
-        VALUES (?, ?, ?, ?, ?)
-      `, [
-        responseId,
-        signedToken.sid,
-        signedToken.rid,
-        signedToken.ans,
-        JSON.stringify(metadata)
-      ])
+    // Insert response record
+    await db.run(`
+      INSERT INTO responses (id, survey_id, recipient_id, option_id, metadata)
+      VALUES (?, ?, ?, ?, ?)
+    `, [
+      responseId,
+      signedToken.sid,
+      signedToken.rid,
+      signedToken.ans,
+      JSON.stringify(metadata)
+    ])
 
-      await db.run(`
-        INSERT INTO response_events (id, response_id, event_type, ip_address, user_agent)
-        VALUES (?, ?, ?, ?, ?)
-      `, [
-        crypto.randomUUID(),
-        responseId,
-        'response_submitted',
-        ip,
-        userAgent
-      ])
+    // Insert response event
+    await db.run(`
+      INSERT INTO response_events (id, response_id, event_type, ip_address, user_agent)
+      VALUES (?, ?, ?, ?, ?)
+    `, [
+      crypto.randomUUID(),
+      responseId,
+      'response_submitted',
+      ip,
+      userAgent
+    ])
 
-      await db.run(`
-        INSERT INTO bot_scores (response_id, score, factors)
-        VALUES (?, ?, ?)
-      `, [
-        responseId,
-        totalScore,
-        JSON.stringify(botScore)
-      ])
-    })
+    // Insert bot score
+    await db.run(`
+      INSERT INTO bot_scores (response_id, score, factors)
+      VALUES (?, ?, ?)
+    `, [
+      responseId,
+      totalScore,
+      JSON.stringify(botScore)
+    ])
 
     const survey = await getSurveyById(signedToken.sid)
     const option = await getOptionById(signedToken.ans)

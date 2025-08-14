@@ -27,10 +27,12 @@ function ThankYouContent() {
       fetch(`/api/surveys/${surveyId}/public`)
         .then(res => res.json())
         .then(data => {
+          console.log('Survey data loaded:', data)
           setSurvey(data)
           
           // Inject tracking script if provided
           if (data.settings?.trackingScript) {
+            console.log('Found tracking script:', data.settings.trackingScript)
             // Extract JavaScript code from script tags if present
             let scriptContent = data.settings.trackingScript.trim()
             
@@ -39,6 +41,9 @@ function ThankYouContent() {
             const match = scriptTagRegex.exec(scriptContent)
             if (match) {
               scriptContent = match[1] // Extract content between script tags
+              console.log('Extracted script content:', scriptContent)
+            } else {
+              console.log('Using script as-is:', scriptContent)
             }
             
             // Create and execute the script
@@ -46,6 +51,14 @@ function ThankYouContent() {
             script.type = 'text/javascript'
             script.text = scriptContent
             document.head.appendChild(script)
+            console.log('Script injected to head')
+            
+            // Also check if pixel is present
+            if (data.settings?.trackingPixel) {
+              console.log('Tracking pixel URL:', data.settings.trackingPixel)
+            }
+          } else {
+            console.log('No tracking script found in settings')
           }
         })
         .catch(err => console.error('Failed to fetch survey:', err))
