@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
       await db.run(`
         INSERT INTO responses (id, survey_id, recipient_id, option_id, metadata)
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES (?, ?, ?, ?, ?)
       `, [
         responseId,
         signedToken.sid,
@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
 
       await db.run(`
         INSERT INTO response_events (id, response_id, event_type, ip_address, user_agent)
-        VALUES ($1, $2, $3, $4, $5)
+        VALUES (?, ?, ?, ?, ?)
       `, [
         crypto.randomUUID(),
         responseId,
@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
       await db.run(`
         INSERT INTO bot_scores (response_id, score, factors)
-        VALUES ($1, $2, $3)
+        VALUES (?, ?, ?)
       `, [
         responseId,
         totalScore,
@@ -124,19 +124,19 @@ function getClientIP(request: NextRequest): string {
 async function checkExistingResponse(surveyId: string, recipientId: string) {
   return await db.get(`
     SELECT id FROM responses 
-    WHERE survey_id = $1 AND recipient_id = $2
+    WHERE survey_id = ? AND recipient_id = ?
     LIMIT 1
   `, [surveyId, recipientId])
 }
 
 async function getSurveyById(surveyId: string) {
   return await db.get(`
-    SELECT * FROM surveys WHERE id = $1
+    SELECT * FROM surveys WHERE id = ?
   `, [surveyId])
 }
 
 async function getOptionById(optionId: string) {
   return await db.get(`
-    SELECT * FROM survey_options WHERE id = $1
+    SELECT * FROM survey_options WHERE id = ?
   `, [optionId])
 }

@@ -24,7 +24,7 @@ function ThankYouContent() {
   // Fetch survey data to get enhanced settings
   useEffect(() => {
     if (surveyId) {
-      fetch(`/api/surveys/${surveyId}`)
+      fetch(`/api/surveys/${surveyId}/public`)
         .then(res => res.json())
         .then(data => {
           setSurvey(data)
