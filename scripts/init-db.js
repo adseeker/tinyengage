@@ -76,11 +76,21 @@ db.exec(`
     FOREIGN KEY (response_id) REFERENCES responses(id) ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS follow_up_responses (
+    id TEXT PRIMARY KEY,
+    survey_id TEXT NOT NULL,
+    response TEXT NOT NULL,
+    original_response TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (survey_id) REFERENCES surveys(id) ON DELETE CASCADE
+  );
+
   CREATE INDEX IF NOT EXISTS idx_surveys_user_id ON surveys(user_id);
   CREATE INDEX IF NOT EXISTS idx_survey_options_survey_id ON survey_options(survey_id);
   CREATE INDEX IF NOT EXISTS idx_responses_survey_id ON responses(survey_id);
   CREATE INDEX IF NOT EXISTS idx_responses_created_at ON responses(created_at);
   CREATE INDEX IF NOT EXISTS idx_response_events_timestamp ON response_events(timestamp);
+  CREATE INDEX IF NOT EXISTS idx_follow_up_responses_survey_id ON follow_up_responses(survey_id);
 `);
 
 console.log('Database initialized successfully at:', dbPath);

@@ -31,6 +31,20 @@ export interface SurveySettings {
   thankYouMessage?: string
   redirectUrl?: string
   expiresAt?: Date
+  // Enhanced thank you page settings
+  trackingPixel?: string
+  upsellSection?: {
+    enabled: boolean
+    title: string
+    description: string
+    ctaText: string
+    ctaUrl: string
+  }
+  followUpQuestion?: {
+    enabled: boolean
+    question: string
+    placeholder?: string
+  }
 }
 
 export interface Response {

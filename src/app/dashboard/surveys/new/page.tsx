@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { EMAIL_TEMPLATES } from '@/lib/constants'
 import { CreateSurveyRequest, SurveyOption } from '@/types'
@@ -15,6 +17,18 @@ export default function NewSurveyPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<keyof typeof EMAIL_TEMPLATES>('EMOJI_SATISFACTION')
   const [customOptions, setCustomOptions] = useState<SurveyOption[]>([])
   const [isLoading, setIsLoading] = useState(false)
+  
+  // Enhanced thank you page settings
+  const [thankYouMessage, setThankYouMessage] = useState('')
+  const [trackingPixel, setTrackingPixel] = useState('')
+  const [upsellEnabled, setUpsellEnabled] = useState(false)
+  const [upsellTitle, setUpsellTitle] = useState('')
+  const [upsellDescription, setUpsellDescription] = useState('')
+  const [upsellCtaText, setUpsellCtaText] = useState('')
+  const [upsellCtaUrl, setUpsellCtaUrl] = useState('')
+  const [followUpEnabled, setFollowUpEnabled] = useState(false)
+  const [followUpQuestion, setFollowUpQuestion] = useState('')
+  const [followUpPlaceholder, setFollowUpPlaceholder] = useState('')
   
   const router = useRouter()
   const { accessToken } = useAuth()
@@ -50,7 +64,21 @@ export default function NewSurveyPage() {
         options: customOptions.map(({ id, ...option }) => option),
         settings: {
           requireRecipientId: false,
-          botDetectionEnabled: true
+          botDetectionEnabled: true,
+          thankYouMessage: thankYouMessage.trim() || undefined,
+          trackingPixel: trackingPixel.trim() || undefined,
+          upsellSection: upsellEnabled ? {
+            enabled: true,
+            title: upsellTitle,
+            description: upsellDescription,
+            ctaText: upsellCtaText,
+            ctaUrl: upsellCtaUrl
+          } : undefined,
+          followUpQuestion: followUpEnabled ? {
+            enabled: true,
+            question: followUpQuestion,
+            placeholder: followUpPlaceholder.trim() || undefined
+          } : undefined
         }
       }
 
@@ -188,6 +216,137 @@ export default function NewSurveyPage() {
                   ))}
                 </div>
               </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Enhanced Thank You Page</CardTitle>
+            <CardDescription>Configure tracking, upsells, and follow-up questions</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Custom thank you message */}
+            <div className="space-y-2">
+              <label htmlFor="thankYouMessage" className="text-sm font-medium">
+                Custom Thank You Message (optional)
+              </label>
+              <Input
+                id="thankYouMessage"
+                value={thankYouMessage}
+                onChange={(e) => setThankYouMessage(e.target.value)}
+                placeholder="Thank you for your feedback!"
+              />
+            </div>
+
+            {/* Tracking pixel */}
+            <div className="space-y-2">
+              <label htmlFor="trackingPixel" className="text-sm font-medium">
+                Tracking Pixel URL (optional)
+              </label>
+              <Input
+                id="trackingPixel"
+                value={trackingPixel}
+                onChange={(e) => setTrackingPixel(e.target.value)}
+                placeholder="https://analytics.example.com/pixel.png"
+              />
+              <p className="text-xs text-gray-500">
+                Add a 1x1 pixel for tracking conversions or retargeting
+              </p>
+            </div>
+
+            {/* Upsell section */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="upsell-enabled"
+                  checked={upsellEnabled}
+                  onCheckedChange={setUpsellEnabled}
+                />
+                <label htmlFor="upsell-enabled" className="text-sm font-medium">
+                  Enable Upsell Section
+                </label>
+              </div>
+              
+              {upsellEnabled && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6 border-l-2 border-blue-200">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Upsell Title</label>
+                    <Input
+                      value={upsellTitle}
+                      onChange={(e) => setUpsellTitle(e.target.value)}
+                      placeholder="Want more insights?"
+                      required={upsellEnabled}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Call-to-Action Text</label>
+                    <Input
+                      value={upsellCtaText}
+                      onChange={(e) => setUpsellCtaText(e.target.value)}
+                      placeholder="Subscribe to Newsletter"
+                      required={upsellEnabled}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Description</label>
+                    <Textarea
+                      value={upsellDescription}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setUpsellDescription(e.target.value)}
+                      placeholder="Get weekly insights delivered to your inbox"
+                      rows={2}
+                      required={upsellEnabled}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">CTA URL</label>
+                    <Input
+                      value={upsellCtaUrl}
+                      onChange={(e) => setUpsellCtaUrl(e.target.value)}
+                      placeholder="https://example.com/subscribe"
+                      type="url"
+                      required={upsellEnabled}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Follow-up question */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="followup-enabled"
+                  checked={followUpEnabled}
+                  onCheckedChange={setFollowUpEnabled}
+                />
+                <label htmlFor="followup-enabled" className="text-sm font-medium">
+                  Enable Follow-up Question
+                </label>
+              </div>
+              
+              {followUpEnabled && (
+                <div className="space-y-4 pl-6 border-l-2 border-green-200">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Follow-up Question</label>
+                    <Textarea
+                      value={followUpQuestion}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFollowUpQuestion(e.target.value)}
+                      placeholder="Can you tell us more about your experience?"
+                      rows={2}
+                      required={followUpEnabled}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Placeholder Text (optional)</label>
+                    <Input
+                      value={followUpPlaceholder}
+                      onChange={(e) => setFollowUpPlaceholder(e.target.value)}
+                      placeholder="Your thoughts..."
+                    />
+                  </div>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

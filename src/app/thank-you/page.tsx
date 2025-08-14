@@ -1,8 +1,12 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Survey } from '@/types'
 
 function ThankYouContent() {
   const searchParams = useSearchParams()
@@ -10,33 +14,78 @@ function ThankYouContent() {
   const selectedOption = searchParams.get('option')
   const selectedEmoji = searchParams.get('emoji')
   const isDuplicate = searchParams.get('duplicate') === 'true'
+  
+  const [survey, setSurvey] = useState<Survey | null>(null)
+  const [followUpResponse, setFollowUpResponse] = useState('')
+  const [isSubmittingFollowUp, setIsSubmittingFollowUp] = useState(false)
+  const [followUpSubmitted, setFollowUpSubmitted] = useState(false)
+
+  // Fetch survey data to get enhanced settings
+  useEffect(() => {
+    if (surveyId) {
+      fetch(`/api/surveys/${surveyId}`)
+        .then(res => res.json())
+        .then(data => setSurvey(data))
+        .catch(err => console.error('Failed to fetch survey:', err))
+    }
+  }, [surveyId])
+
+  const handleFollowUpSubmit = async () => {
+    if (!followUpResponse.trim() || !surveyId) return
+    
+    setIsSubmittingFollowUp(true)
+    try {
+      await fetch('/api/follow-up-responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          surveyId,
+          response: followUpResponse,
+          originalResponse: selectedOption
+        })
+      })
+      setFollowUpSubmitted(true)
+    } catch (error) {
+      console.error('Failed to submit follow-up:', error)
+    } finally {
+      setIsSubmittingFollowUp(false)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md text-center">
-        <CardHeader>
-          <div className="text-6xl mb-4">
-            {isDuplicate ? '🔒' : selectedEmoji || '✅'}
-          </div>
-          <CardTitle className="text-2xl">
-            {isDuplicate ? 'Already Responded' : 'Thank You!'}
-          </CardTitle>
-          <CardDescription>
-            {isDuplicate 
-              ? 'You have already responded to this survey.'
-              : selectedOption 
-                ? `Your response "${selectedOption}" has been recorded.`
-                : 'Your response has been recorded.'
-            }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!isDuplicate && (
-            <>
-              <p className="text-gray-600 mb-6">
-                Your feedback helps us improve our service. We appreciate you taking the time to respond!
-              </p>
-              
+      {/* Tracking Pixel */}
+      {survey?.settings.trackingPixel && (
+        <img 
+          src={survey.settings.trackingPixel} 
+          alt="" 
+          style={{ width: '1px', height: '1px', position: 'absolute', top: 0, left: 0 }} 
+        />
+      )}
+      
+      <div className="w-full max-w-md space-y-6">
+        {/* Main Thank You Card */}
+        <Card className="text-center">
+          <CardHeader>
+            <div className="text-6xl mb-4">
+              {isDuplicate ? '🔒' : selectedEmoji || '✅'}
+            </div>
+            <CardTitle className="text-2xl">
+              {isDuplicate ? 'Already Responded' : 'Thank You!'}
+            </CardTitle>
+            <CardDescription>
+              {isDuplicate 
+                ? 'You have already responded to this survey.'
+                : survey?.settings.thankYouMessage ||
+                  (selectedOption 
+                    ? `Your response "${selectedOption}" has been recorded.`
+                    : 'Your response has been recorded.'
+                  )
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {!isDuplicate && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <div className="flex items-center justify-center space-x-2">
                   <div className="text-green-600">
@@ -47,16 +96,81 @@ function ThankYouContent() {
                   <span className="text-green-800 font-medium">Response recorded successfully</span>
                 </div>
               </div>
-            </>
-          )}
-          
-          {isDuplicate && (
-            <p className="text-gray-600">
-              Each person can only respond once to maintain the integrity of our survey results.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+            )}
+            
+            {isDuplicate && (
+              <p className="text-gray-600">
+                Each person can only respond once to maintain the integrity of our survey results.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Follow-up Question */}
+        {!isDuplicate && survey?.settings.followUpQuestion?.enabled && !followUpSubmitted && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">One more thing...</CardTitle>
+              <CardDescription>
+                {survey.settings.followUpQuestion.question}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Textarea
+                placeholder={survey.settings.followUpQuestion.placeholder || "Your thoughts..."}
+                value={followUpResponse}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFollowUpResponse(e.target.value)}
+                rows={3}
+              />
+              <Button 
+                onClick={handleFollowUpSubmit}
+                disabled={!followUpResponse.trim() || isSubmittingFollowUp}
+                className="w-full"
+              >
+                {isSubmittingFollowUp ? 'Submitting...' : 'Submit'}
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Follow-up submitted confirmation */}
+        {followUpSubmitted && (
+          <Card className="border-green-200 bg-green-50">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-2xl mb-2">🙏</div>
+                <p className="text-green-800 font-medium">Thanks for the additional feedback!</p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Upsell Section */}
+        {!isDuplicate && survey?.settings.upsellSection?.enabled && (
+          <Card className="border-blue-200 bg-blue-50">
+            <CardHeader>
+              <CardTitle className="text-lg">{survey.settings.upsellSection.title}</CardTitle>
+              <CardDescription>
+                {survey.settings.upsellSection.description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button 
+                asChild 
+                className="w-full bg-blue-600 hover:bg-blue-700"
+              >
+                <a 
+                  href={survey.settings.upsellSection.ctaUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                >
+                  {survey.settings.upsellSection.ctaText}
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
       
       <div className="absolute bottom-8 text-center w-full">
         <p className="text-sm text-gray-500">
