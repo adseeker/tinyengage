@@ -23,6 +23,7 @@ export default function NewSurveyPage() {
   const [thankYouMessage, setThankYouMessage] = useState('')
   const [trackingPixel, setTrackingPixel] = useState('')
   const [trackingScript, setTrackingScript] = useState('')
+  const [facebookPixelId, setFacebookPixelId] = useState('')
   const [upsellEnabled, setUpsellEnabled] = useState(false)
   const [upsellTitle, setUpsellTitle] = useState('')
   const [upsellDescription, setUpsellDescription] = useState('')
@@ -70,6 +71,7 @@ export default function NewSurveyPage() {
           thankYouMessage: thankYouMessage.trim() || undefined,
           trackingPixel: trackingPixel.trim() || undefined,
           trackingScript: trackingScript.trim() || undefined,
+          facebookPixelId: facebookPixelId.trim() || undefined,
           upsellSection: upsellEnabled ? {
             enabled: true,
             title: upsellTitle,
@@ -265,26 +267,44 @@ export default function NewSurveyPage() {
                 </p>
               </div>
 
-              {/* JavaScript code */}
+              {/* Facebook Pixel ID */}
               <div className="space-y-2">
-                <label htmlFor="trackingScript" className="text-sm font-medium">
-                  Tracking script (goes in &lt;head&gt;)
+                <label htmlFor="facebookPixelId" className="text-sm font-medium">
+                  Facebook Pixel ID
                 </label>
-                <Textarea
-                  id="trackingScript"
-                  value={trackingScript}
-                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTrackingScript(e.target.value)}
-                  placeholder="<script>
-// Your tracking code here
-gtag('event', 'conversion', {'send_to': 'AW-123456/abc'});
-</script>"
-                  rows={4}
-                  className="font-mono text-xs"
+                <Input
+                  id="facebookPixelId"
+                  value={facebookPixelId}
+                  onChange={(e) => setFacebookPixelId(e.target.value)}
+                  placeholder="487547170517547"
                 />
                 <p className="text-xs text-gray-500">
-                  JavaScript code for advanced analytics (Google Analytics, Facebook Pixel, etc.)
+                  Enter your Facebook Pixel ID (numbers only). We'll automatically inject the tracking code.
                 </p>
               </div>
+
+              {/* Advanced: Custom tracking script */}
+              <details className="space-y-2">
+                <summary className="text-sm font-medium cursor-pointer text-gray-700 hover:text-gray-900">
+                  Advanced: Custom tracking script
+                </summary>
+                <div className="space-y-2 pt-2">
+                  <Textarea
+                    id="trackingScript"
+                    value={trackingScript}
+                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTrackingScript(e.target.value)}
+                    placeholder="<script>
+// Your custom tracking code here
+gtag('event', 'conversion', {'send_to': 'AW-123456/abc'});
+</script>"
+                    rows={4}
+                    className="font-mono text-xs"
+                  />
+                  <p className="text-xs text-gray-500">
+                    For advanced users: Custom JavaScript code for other analytics platforms
+                  </p>
+                </div>
+              </details>
             </div>
 
             {/* Upsell section */}

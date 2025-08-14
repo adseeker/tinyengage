@@ -34,6 +34,7 @@ export interface SurveySettings {
   // Enhanced thank you page settings
   trackingPixel?: string
   trackingScript?: string
+  facebookPixelId?: string // New: Simple Facebook Pixel ID field
   upsellSection?: {
     enabled: boolean
     title: string

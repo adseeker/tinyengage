@@ -36,6 +36,7 @@ export async function GET(
         thankYouMessage: parsedSettings?.thankYouMessage,
         trackingPixel: parsedSettings?.trackingPixel,
         trackingScript: parsedSettings?.trackingScript,
+        facebookPixelId: parsedSettings?.facebookPixelId,
         upsellSection: parsedSettings?.upsellSection,
         followUpQuestion: parsedSettings?.followUpQuestion
       }

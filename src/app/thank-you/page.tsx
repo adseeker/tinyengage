@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Survey } from '@/types'
+import { generateFacebookPixelScript } from '@/lib/tracking'
 
 function ThankYouContent() {
   const searchParams = useSearchParams()
@@ -29,9 +30,18 @@ function ThankYouContent() {
         .then(data => {
           setSurvey(data)
           
-          // Inject tracking script if provided
-          if (data.settings?.trackingScript) {
-            // Extract JavaScript code from script tags if present
+          // Inject tracking scripts - prioritize Facebook Pixel ID over custom script
+          let scriptToInject = ''
+          
+          if (data.settings?.facebookPixelId) {
+            // Generate Facebook Pixel script automatically
+            try {
+              scriptToInject = generateFacebookPixelScript(data.settings.facebookPixelId)
+            } catch (error) {
+              console.error('Invalid Facebook Pixel ID:', error)
+            }
+          } else if (data.settings?.trackingScript) {
+            // Fall back to custom tracking script for backward compatibility
             let scriptContent = data.settings.trackingScript.trim()
             
             // Remove script tags if they exist (handle both cases: with and without tags)
@@ -41,10 +51,14 @@ function ThankYouContent() {
               scriptContent = match[1] // Extract content between script tags
             }
             
-            // Create and execute the script
+            scriptToInject = scriptContent
+          }
+          
+          // Inject the script into the page
+          if (scriptToInject) {
             const script = document.createElement('script')
             script.type = 'text/javascript'
-            script.text = scriptContent
+            script.text = scriptToInject
             document.head.appendChild(script)
           }
         })
