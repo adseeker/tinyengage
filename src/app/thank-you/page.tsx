@@ -31,8 +31,20 @@ function ThankYouContent() {
           
           // Inject tracking script if provided
           if (data.settings?.trackingScript) {
+            // Extract JavaScript code from script tags if present
+            let scriptContent = data.settings.trackingScript.trim()
+            
+            // Remove script tags if they exist (handle both cases: with and without tags)
+            const scriptTagRegex = /<script[^>]*>([\s\S]*?)<\/script>/gi
+            const match = scriptTagRegex.exec(scriptContent)
+            if (match) {
+              scriptContent = match[1] // Extract content between script tags
+            }
+            
+            // Create and execute the script
             const script = document.createElement('script')
-            script.innerHTML = data.settings.trackingScript
+            script.type = 'text/javascript'
+            script.text = scriptContent
             document.head.appendChild(script)
           }
         })
