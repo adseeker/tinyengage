@@ -7,18 +7,16 @@ export default function Home() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <Image 
               src="/logo.svg" 
               alt="TinyEngagement Logo" 
-              width={120} 
-              height={120}
+              width={400} 
+              height={80}
               priority
+              className="h-16 w-auto"
             />
           </div>
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
-            TinyEngagement
-          </h1>
           <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto">
             Collect feedback directly from emails with one-click survey buttons
           </p>

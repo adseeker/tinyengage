@@ -45,17 +45,18 @@ export default function RegisterPage() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-6">
             <Image 
               src="/logo.svg" 
               alt="TinyEngagement Logo" 
-              width={60} 
-              height={60}
+              width={240} 
+              height={48}
+              className="h-10 w-auto"
             />
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>
-            Start collecting feedback with TinyEngagement
+            Start collecting feedback today
           </CardDescription>
         </CardHeader>
         <CardContent>

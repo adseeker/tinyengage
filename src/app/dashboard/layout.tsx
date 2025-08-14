@@ -40,14 +40,14 @@ export default function DashboardLayout({
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
-              <Link href="/dashboard" className="flex items-center space-x-3">
+              <Link href="/dashboard">
                 <Image 
                   src="/logo.svg" 
                   alt="TinyEngagement Logo" 
-                  width={32} 
-                  height={32}
+                  width={180} 
+                  height={36}
+                  className="h-8 w-auto"
                 />
-                <span className="text-xl font-bold text-gray-900">TinyEngagement</span>
               </Link>
               <div className="ml-10 flex space-x-8">
                 <Link
