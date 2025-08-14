@@ -5,7 +5,7 @@ import { db } from '@/lib/database'
 // GET /api/surveys/[id] - Get single survey
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication
@@ -20,7 +20,7 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const surveyId = params.id
+    const { id: surveyId } = await params
 
     // Get survey with user_id filtering for security
     const survey = await db.get(`
@@ -76,7 +76,7 @@ export async function GET(
 // PUT /api/surveys/[id] - Update survey
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Verify authentication
@@ -91,7 +91,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const surveyId = params.id
+    const { id: surveyId } = await params
     const body = await request.json()
     const { title, description, settings } = body
 

@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -56,10 +57,12 @@ function ThankYouContent() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
       {/* Tracking Pixel */}
       {survey?.settings.trackingPixel && (
-        <img 
+        <Image 
           src={survey.settings.trackingPixel} 
           alt="" 
-          style={{ width: '1px', height: '1px', position: 'absolute', top: 0, left: 0 }} 
+          width={1}
+          height={1}
+          style={{ position: 'absolute', top: 0, left: 0 }} 
         />
       )}
       
