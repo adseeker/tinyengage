@@ -34,6 +34,12 @@ export interface DatabaseInterface {
   transaction<T>(fn: () => Promise<T>): Promise<T>
 }
 
+// Helper function to convert SQLite-style (?) to PostgreSQL-style ($1, $2) parameters
+function convertSqliteToPostgres(sql: string): string {
+  let paramIndex = 1
+  return sql.replace(/\?/g, () => `$${paramIndex++}`)
+}
+
 // PostgreSQL implementation
 class PostgreSQLDatabase implements DatabaseInterface {
   private pool: Pool
@@ -43,17 +49,20 @@ class PostgreSQLDatabase implements DatabaseInterface {
   }
 
   async query(sql: string, params: any[] = []): Promise<any[]> {
-    const result = await this.pool.query(sql, params)
+    const convertedSql = convertSqliteToPostgres(sql)
+    const result = await this.pool.query(convertedSql, params)
     return result.rows
   }
 
   async get(sql: string, params: any[] = []): Promise<any> {
-    const result = await this.pool.query(sql, params)
+    const convertedSql = convertSqliteToPostgres(sql)
+    const result = await this.pool.query(convertedSql, params)
     return result.rows[0] || null
   }
 
   async run(sql: string, params: any[] = []): Promise<{ lastInsertRowid?: number; changes?: number }> {
-    const result = await this.pool.query(sql, params)
+    const convertedSql = convertSqliteToPostgres(sql)
+    const result = await this.pool.query(convertedSql, params)
     return { changes: result.rowCount || 0 }
   }
 
