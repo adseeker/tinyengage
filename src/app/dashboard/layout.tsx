@@ -44,9 +44,9 @@ export default function DashboardLayout({
                 <Image 
                   src="/logo.svg" 
                   alt="TinyEngagement Logo" 
-                  width={180} 
-                  height={36}
-                  className="h-8 w-auto"
+                  width={220} 
+                  height={44}
+                  className="h-10 w-auto"
                 />
               </Link>
               <div className="ml-10 flex space-x-8">

@@ -37,9 +37,9 @@ export default function LoginPage() {
             <Image 
               src="/logo.svg" 
               alt="TinyEngagement Logo" 
-              width={240} 
-              height={48}
-              className="h-10 w-auto"
+              width={360} 
+              height={72}
+              className="h-14 w-auto"
             />
           </div>
           <CardTitle className="text-2xl">Sign In</CardTitle>

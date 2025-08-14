@@ -7,14 +7,14 @@ export default function Home() {
       {/* Hero Section */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
-          <div className="flex justify-center mb-8">
+          <div className="flex justify-center mb-12">
             <Image 
               src="/logo.svg" 
               alt="TinyEngagement Logo" 
-              width={400} 
-              height={80}
+              width={600} 
+              height={120}
               priority
-              className="h-16 w-auto"
+              className="h-24 w-auto"
             />
           </div>
           <p className="text-xl text-gray-600 mb-4 max-w-3xl mx-auto">
