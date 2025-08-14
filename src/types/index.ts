@@ -33,6 +33,7 @@ export interface SurveySettings {
   expiresAt?: Date
   // Enhanced thank you page settings
   trackingPixel?: string
+  trackingScript?: string
   upsellSection?: {
     enabled: boolean
     title: string

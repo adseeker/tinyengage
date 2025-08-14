@@ -26,7 +26,16 @@ function ThankYouContent() {
     if (surveyId) {
       fetch(`/api/surveys/${surveyId}`)
         .then(res => res.json())
-        .then(data => setSurvey(data))
+        .then(data => {
+          setSurvey(data)
+          
+          // Inject tracking script if provided
+          if (data.settings.trackingScript) {
+            const script = document.createElement('script')
+            script.innerHTML = data.settings.trackingScript
+            document.head.appendChild(script)
+          }
+        })
         .catch(err => console.error('Failed to fetch survey:', err))
     }
   }, [surveyId])

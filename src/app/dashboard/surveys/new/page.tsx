@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { ThankYouPreview } from '@/components/ThankYouPreview'
 import { EMAIL_TEMPLATES } from '@/lib/constants'
 import { CreateSurveyRequest, SurveyOption } from '@/types'
 
@@ -21,6 +22,7 @@ export default function NewSurveyPage() {
   // Enhanced thank you page settings
   const [thankYouMessage, setThankYouMessage] = useState('')
   const [trackingPixel, setTrackingPixel] = useState('')
+  const [trackingScript, setTrackingScript] = useState('')
   const [upsellEnabled, setUpsellEnabled] = useState(false)
   const [upsellTitle, setUpsellTitle] = useState('')
   const [upsellDescription, setUpsellDescription] = useState('')
@@ -67,6 +69,7 @@ export default function NewSurveyPage() {
           botDetectionEnabled: true,
           thankYouMessage: thankYouMessage.trim() || undefined,
           trackingPixel: trackingPixel.trim() || undefined,
+          trackingScript: trackingScript.trim() || undefined,
           upsellSection: upsellEnabled ? {
             enabled: true,
             title: upsellTitle,
@@ -242,20 +245,46 @@ export default function NewSurveyPage() {
               </p>
             </div>
 
-            {/* Tracking pixel */}
-            <div className="space-y-2">
-              <label htmlFor="trackingPixel" className="text-sm font-medium">
-                Track conversions
-              </label>
-              <Input
-                id="trackingPixel"
-                value={trackingPixel}
-                onChange={(e) => setTrackingPixel(e.target.value)}
-                placeholder="https://your-analytics.com/pixel"
-              />
-              <p className="text-xs text-gray-500">
-                Add your tracking pixel URL to measure conversions
-              </p>
+            {/* Tracking */}
+            <div className="space-y-4">
+              <h4 className="text-sm font-medium">Track conversions</h4>
+              
+              {/* Pixel URL */}
+              <div className="space-y-2">
+                <label htmlFor="trackingPixel" className="text-sm font-medium">
+                  Tracking pixel URL
+                </label>
+                <Input
+                  id="trackingPixel"
+                  value={trackingPixel}
+                  onChange={(e) => setTrackingPixel(e.target.value)}
+                  placeholder="https://your-analytics.com/pixel.png"
+                />
+                <p className="text-xs text-gray-500">
+                  1x1 pixel image for basic conversion tracking
+                </p>
+              </div>
+
+              {/* JavaScript code */}
+              <div className="space-y-2">
+                <label htmlFor="trackingScript" className="text-sm font-medium">
+                  Tracking script (goes in &lt;head&gt;)
+                </label>
+                <Textarea
+                  id="trackingScript"
+                  value={trackingScript}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTrackingScript(e.target.value)}
+                  placeholder="<script>
+// Your tracking code here
+gtag('event', 'conversion', {'send_to': 'AW-123456/abc'});
+</script>"
+                  rows={4}
+                  className="font-mono text-xs"
+                />
+                <p className="text-xs text-gray-500">
+                  JavaScript code for advanced analytics (Google Analytics, Facebook Pixel, etc.)
+                </p>
+              </div>
             </div>
 
             {/* Upsell section */}
@@ -357,6 +386,33 @@ export default function NewSurveyPage() {
                 </div>
               )}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Preview thank you page</CardTitle>
+            <CardDescription>How your thank you page will look to users</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThankYouPreview
+              title={title}
+              thankYouMessage={thankYouMessage}
+              selectedOption={customOptions[0]?.label || "Great!"}
+              selectedEmoji={customOptions[0]?.emoji || "😃"}
+              upsellSection={upsellEnabled ? {
+                enabled: true,
+                title: upsellTitle || "Stay in the loop",
+                description: upsellDescription || "Get weekly insights in your inbox",
+                ctaText: upsellCtaText || "Subscribe",
+                ctaUrl: upsellCtaUrl || "#"
+              } : undefined}
+              followUpQuestion={followUpEnabled ? {
+                enabled: true,
+                question: followUpQuestion || "What could we improve?",
+                placeholder: followUpPlaceholder || "Tell us more..."
+              } : undefined}
+            />
           </CardContent>
         </Card>
 
