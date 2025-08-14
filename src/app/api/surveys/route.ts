@@ -109,12 +109,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
+    // Check for archived filter parameter
+    const { searchParams } = new URL(request.url)
+    const includeArchived = searchParams.get('includeArchived') === 'true'
+    const archivedOnly = searchParams.get('archivedOnly') === 'true'
+
+    // Build WHERE clause based on archive filter
+    let whereClause = 'WHERE s.user_id = ?'
+    if (archivedOnly) {
+      whereClause += ' AND s.archived = 1'
+    } else if (!includeArchived) {
+      whereClause += ' AND (s.archived = 0 OR s.archived IS NULL)'
+    }
+
     const rows = await db.query(`
       SELECT s.*, COUNT(r.id) as response_count
       FROM surveys s
       LEFT JOIN responses r ON s.id = r.survey_id
-      WHERE s.user_id = $1
-      GROUP BY s.id, s.title, s.description, s.type, s.settings, s.created_at, s.user_id
+      ${whereClause}
+      GROUP BY s.id, s.title, s.description, s.type, s.settings, s.created_at, s.user_id, s.archived
       ORDER BY s.created_at DESC
     `, [payload.userId])
     
@@ -126,6 +139,7 @@ export async function GET(request: NextRequest) {
       settings: JSON.parse(row.settings),
       createdAt: new Date(row.created_at),
       userId: row.user_id,
+      archived: Boolean(row.archived),
       responseCount: parseInt(row.response_count) || 0,
       options: await getSurveyOptions(row.id)
     })))

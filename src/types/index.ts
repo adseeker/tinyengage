@@ -15,6 +15,7 @@ export interface Survey {
   settings: SurveySettings
   createdAt: Date
   userId: string
+  archived?: boolean
 }
 
 export interface SurveyOption {

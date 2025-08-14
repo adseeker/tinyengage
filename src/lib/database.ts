@@ -146,6 +146,7 @@ export async function initializeDatabase() {
       description TEXT,
       type VARCHAR(50) NOT NULL,
       settings TEXT NOT NULL,
+      archived BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -215,6 +216,7 @@ export async function initializeDatabase() {
       description TEXT,
       type TEXT NOT NULL,
       settings TEXT NOT NULL,
+      archived BOOLEAN DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     );
@@ -274,5 +276,33 @@ export async function initializeDatabase() {
     }
   }
 
+  // Run migrations for existing tables
+  await runMigrations()
+
   console.log(`Database initialized successfully (${isPostgreSQL ? 'PostgreSQL' : 'SQLite'})`)
+
+// Migration function to add archived column to existing surveys
+async function runMigrations() {
+  try {
+    // Check if archived column exists, if not add it
+    if (isPostgreSQL) {
+      await db.run(`
+        ALTER TABLE surveys 
+        ADD COLUMN IF NOT EXISTS archived BOOLEAN DEFAULT FALSE
+      `)
+    } else {
+      // SQLite doesn't support ADD COLUMN IF NOT EXISTS, so we need to check first
+      try {
+        await db.run(`ALTER TABLE surveys ADD COLUMN archived BOOLEAN DEFAULT 0`)
+      } catch (error: any) {
+        // Column already exists or other error - ignore if it's duplicate column
+        if (!error.message?.includes('duplicate column')) {
+          console.warn('Migration warning:', error.message)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Migration error:', error)
+  }
+}
 }

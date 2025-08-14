@@ -61,7 +61,8 @@ export async function GET(
       options: options || [],
       settings: parsedSettings,
       createdAt: survey.created_at,
-      userId: survey.user_id
+      userId: survey.user_id,
+      archived: Boolean(survey.archived)
     })
 
   } catch (error) {

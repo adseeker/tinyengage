@@ -12,6 +12,7 @@ interface Survey {
   type: string
   createdAt: string
   responseCount: number
+  archived: boolean
 }
 
 export default function DashboardPage() {
@@ -23,16 +24,22 @@ export default function DashboardPage() {
     responseRate: 0
   })
   const [isLoading, setIsLoading] = useState(true)
+  const [showArchived, setShowArchived] = useState(false)
+  const [archiveLoading, setArchiveLoading] = useState<string | null>(null)
 
   useEffect(() => {
     if (accessToken) {
       fetchSurveys()
     }
-  }, [accessToken])
+  }, [accessToken, showArchived])
 
   const fetchSurveys = async () => {
     try {
-      const response = await fetch('/api/surveys', {
+      const url = showArchived 
+        ? '/api/surveys?archivedOnly=true'
+        : '/api/surveys'
+        
+      const response = await fetch(url, {
         headers: {
           'Authorization': `Bearer ${accessToken}`
         }
@@ -56,6 +63,33 @@ export default function DashboardPage() {
       console.error('Failed to fetch surveys:', error)
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const toggleArchive = async (surveyId: string, currentlyArchived: boolean) => {
+    setArchiveLoading(surveyId)
+    try {
+      const response = await fetch(`/api/surveys/${surveyId}/archive`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ archived: !currentlyArchived })
+      })
+
+      if (response.ok) {
+        // Refresh surveys list
+        await fetchSurveys()
+      } else {
+        console.error('Failed to toggle archive status')
+        alert('Failed to update survey status')
+      }
+    } catch (error) {
+      console.error('Archive toggle error:', error)
+      alert('Failed to update survey status')
+    } finally {
+      setArchiveLoading(null)
     }
   }
 
@@ -110,7 +144,17 @@ export default function DashboardPage() {
 
       <div className="bg-white rounded-lg shadow-sm p-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Recent Surveys</h2>
+          <div className="flex items-center gap-4">
+            <h2 className="text-xl font-semibold text-gray-900">
+              {showArchived ? 'Archived Surveys' : 'Recent Surveys'}
+            </h2>
+            <button
+              onClick={() => setShowArchived(!showArchived)}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              {showArchived ? 'Show Active' : 'Show Archived'}
+            </button>
+          </div>
           <Link href="/dashboard/surveys/new">
             <Button>Create Survey</Button>
           </Link>
@@ -127,11 +171,20 @@ export default function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No surveys yet</h3>
-            <p className="text-gray-600 mb-4">Get started by creating your first survey</p>
-            <Link href="/dashboard/surveys/new">
-              <Button>Create Your First Survey</Button>
-            </Link>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {showArchived ? 'No archived surveys' : 'No surveys yet'}
+            </h3>
+            <p className="text-gray-600 mb-4">
+              {showArchived 
+                ? 'Archived surveys will appear here when you archive them'
+                : 'Get started by creating your first survey'
+              }
+            </p>
+            {!showArchived && (
+              <Link href="/dashboard/surveys/new">
+                <Button>Create Your First Survey</Button>
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-4">
@@ -157,6 +210,19 @@ export default function DashboardPage() {
                     <Link href={`/dashboard/surveys/${survey.id}`}>
                       <Button size="sm">View Details</Button>
                     </Link>
+                    <Button 
+                      size="sm" 
+                      variant="ghost"
+                      onClick={() => toggleArchive(survey.id, survey.archived)}
+                      disabled={archiveLoading === survey.id}
+                    >
+                      {archiveLoading === survey.id 
+                        ? '...'
+                        : survey.archived 
+                          ? '📤 Unarchive' 
+                          : '📥 Archive'
+                      }
+                    </Button>
                   </div>
                 </div>
               </div>
