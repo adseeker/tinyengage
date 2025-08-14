@@ -24,7 +24,7 @@ export async function GET(
     const { id: surveyId } = await params
 
     const survey = await db.get(`
-      SELECT * FROM surveys WHERE id = $1 AND user_id = $2
+      SELECT * FROM surveys WHERE id = ? AND user_id = ?
     `, [surveyId, payload.userId])
 
     if (!survey) {
@@ -32,14 +32,14 @@ export async function GET(
     }
 
     const totalResponses = await db.get(`
-      SELECT COUNT(*) as count FROM responses WHERE survey_id = $1
+      SELECT COUNT(*) as count FROM responses WHERE survey_id = ?
     `, [surveyId])
 
     const humanResponses = await db.get(`
       SELECT COUNT(*) as count 
       FROM responses r 
       JOIN bot_scores bs ON r.id = bs.response_id 
-      WHERE r.survey_id = $1 AND bs.score < 50
+      WHERE r.survey_id = ? AND bs.score < 50
     `, [surveyId])
 
     const responsesByOption = await db.query(`
@@ -51,7 +51,7 @@ export async function GET(
         COUNT(r.id) as count
       FROM survey_options so
       LEFT JOIN responses r ON so.id = r.option_id
-      WHERE so.survey_id = $1
+      WHERE so.survey_id = ?
       GROUP BY so.id, so.label, so.emoji, so.color
       ORDER BY so.position ASC
     `, [surveyId])
@@ -61,7 +61,7 @@ export async function GET(
         DATE(created_at) as date,
         COUNT(*) as count
       FROM responses
-      WHERE survey_id = $1
+      WHERE survey_id = ?
       GROUP BY DATE(created_at)
       ORDER BY date DESC
       LIMIT 30
@@ -72,7 +72,7 @@ export async function GET(
         EXTRACT(HOUR FROM created_at) as hour,
         COUNT(*) as count
       FROM responses
-      WHERE survey_id = $1 AND DATE(created_at) = CURRENT_DATE
+      WHERE survey_id = ? AND DATE(created_at) = CURRENT_DATE
       GROUP BY EXTRACT(HOUR FROM created_at)
       ORDER BY hour ASC
     `, [surveyId])
@@ -86,7 +86,7 @@ export async function GET(
         (r.metadata::json->>'isBot')::boolean as is_bot
       FROM responses r
       JOIN survey_options so ON r.option_id = so.id
-      WHERE r.survey_id = $1
+      WHERE r.survey_id = ?
       ORDER BY r.created_at DESC
       LIMIT 50
     `, [surveyId])

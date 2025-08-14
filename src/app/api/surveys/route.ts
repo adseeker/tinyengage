@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     await db.transaction(async () => {
       await db.run(`
         INSERT INTO surveys (id, user_id, title, description, type, settings)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES (?, ?, ?, ?, ?, ?)
       `, [
         surveyId,
         payload.userId,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         
         await db.run(`
           INSERT INTO survey_options (id, survey_id, label, value, emoji, color, position)
-          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          VALUES (?, ?, ?, ?, ?, ?, ?)
         `, [
           optionId,
           surveyId,

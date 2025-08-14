@@ -49,14 +49,14 @@ export async function GET(
 
 async function getSurveyWithOptions(surveyId: string, userId: string) {
   const survey = await db.get(`
-    SELECT * FROM surveys WHERE id = $1 AND user_id = $2
+    SELECT * FROM surveys WHERE id = ? AND user_id = ?
   `, [surveyId, userId])
   
   if (!survey) return null
 
   const options = await db.query(`
     SELECT * FROM survey_options 
-    WHERE survey_id = $1 
+    WHERE survey_id = ? 
     ORDER BY position ASC
   `, [surveyId])
 

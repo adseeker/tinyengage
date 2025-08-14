@@ -110,7 +110,8 @@ class SQLiteDatabase implements DatabaseInterface {
   }
 
   async transaction<T>(fn: () => Promise<T>): Promise<T> {
-    return this.db.transaction(() => fn())()
+    // For SQLite, we'll just run the function directly since better-sqlite3 transactions are synchronous
+    return await fn()
   }
 }
 

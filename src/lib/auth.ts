@@ -60,7 +60,7 @@ export async function createUser(email: string, name: string, password: string):
 
   await db.run(`
     INSERT INTO users (id, email, name, password_hash)
-    VALUES ($1, $2, $3, $4)
+    VALUES (?, ?, ?, ?)
   `, [id, email, name, passwordHash])
   
   return id
@@ -70,7 +70,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   const row = await db.get(`
     SELECT id, email, name, subscription_tier, created_at
     FROM users
-    WHERE email = $1
+    WHERE email = ?
   `, [email])
 
   if (!row) return null
@@ -88,7 +88,7 @@ export async function getUserById(id: string): Promise<User | null> {
   const row = await db.get(`
     SELECT id, email, name, subscription_tier, created_at
     FROM users
-    WHERE id = $1
+    WHERE id = ?
   `, [id])
 
   if (!row) return null
@@ -106,7 +106,7 @@ export async function authenticateUser(email: string, password: string): Promise
   const row = await db.get(`
     SELECT id, email, name, password_hash, subscription_tier, created_at
     FROM users
-    WHERE email = $1
+    WHERE email = ?
   `, [email])
 
   if (!row || !verifyPassword(password, row.password_hash)) {
