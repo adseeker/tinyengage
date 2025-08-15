@@ -70,11 +70,11 @@ export async function GET(
 
     const responsesByHour = await db.query(`
       SELECT 
-        strftime('%H', created_at) as hour,
+        EXTRACT(HOUR FROM created_at) as hour,
         COUNT(*) as count
       FROM responses
-      WHERE survey_id = ? AND DATE(created_at) = DATE('now')
-      GROUP BY strftime('%H', created_at)
+      WHERE survey_id = ? AND DATE(created_at) = CURRENT_DATE
+      GROUP BY EXTRACT(HOUR FROM created_at)
       ORDER BY hour ASC
     `, [surveyId])
 
