@@ -21,7 +21,8 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
-    const { id: surveyId } = await params
+    const resolvedParams = await params
+    const surveyId = resolvedParams.id
 
     const survey = await db.get(`
       SELECT * FROM surveys WHERE id = ? AND user_id = ?
@@ -141,8 +142,11 @@ export async function GET(
 
   } catch (error) {
     console.error('Analytics error:', error)
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+    console.error('Survey ID:', surveyId)
+    console.error('User ID:', payload?.userId)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     )
   }
