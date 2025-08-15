@@ -44,11 +44,11 @@ export default function Home() {
             <p className="text-lg text-muted-foreground mb-12 leading-relaxed max-w-2xl mx-auto">
               Turn your newsletters into engagement engines. Embed interactive survey buttons that your subscribers can click without leaving their inbox.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col justify-center items-center gap-3">
               <Link href="/auth/register" className="btn-primary text-lg px-8 py-4">
                 Create a free survey →
               </Link>
-              <p className="text-sm text-muted-foreground">100% free of charge</p>
+              <p className="text-sm text-muted-foreground">No credit card required.</p>
             </div>
           </div>
 
