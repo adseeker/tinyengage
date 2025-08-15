@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import GTM from '@/components/GTM'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -21,9 +22,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  const gtmId = process.env.NEXT_PUBLIC_GTM_ID
+
   return (
     <html lang="en">
       <body className={inter.className}>
+        {gtmId && <GTM gtmId={gtmId} />}
         {children}
         <Analytics />
         <SpeedInsights />
