@@ -1,50 +1,169 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Modern pastel color system inspired by Tally */
+    --background: 356 100% 99%;
+    --foreground: 220 13% 18%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 13% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+    --popover-foreground: 220 13% 18%;
+    
+    /* Beautiful pastel primary colors */
+    --primary: 250 100% 66%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 250 100% 95%;
+    
+    /* Soft secondary colors */
+    --secondary: 220 13% 97%;
+    --secondary-foreground: 220 13% 18%;
+    
+    /* Pastel accent colors */
+    --accent-pink: 330 100% 88%;
+    --accent-blue: 210 100% 90%;
+    --accent-green: 150 60% 85%;
+    --accent-yellow: 48 100% 88%;
+    --accent-purple: 270 100% 88%;
+    --accent-orange: 30 100% 88%;
+    
+    /* Muted colors */
+    --muted: 220 13% 97%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 13% 97%;
+    --accent-foreground: 220 13% 18%;
+    
+    /* System colors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    
+    /* Border and input */
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 250 100% 66%;
+    --radius: 12px;
+    
+    /* Custom properties for illustrations */
+    --illustration-primary: 250 100% 66%;
+    --illustration-secondary: 330 100% 88%;
+    --illustration-tertiary: 210 100% 90%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 84% 4.9%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 94.1%;
+    --background: 220 13% 6%;
+    --foreground: 220 13% 98%;
+    --card: 220 13% 8%;
+    --card-foreground: 220 13% 98%;
+    --popover: 220 13% 8%;
+    --popover-foreground: 220 13% 98%;
+    --primary: 250 100% 66%;
+    --primary-foreground: 220 13% 6%;
+    --secondary: 220 13% 12%;
+    --secondary-foreground: 220 13% 98%;
+    --muted: 220 13% 12%;
+    --muted-foreground: 220 9% 65%;
+    --accent: 220 13% 12%;
+    --accent-foreground: 220 13% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 13% 98%;
+    --border: 220 13% 20%;
+    --input: 220 13% 20%;
+    --ring: 250 100% 66%;
+  }
+}
+
+@layer components {
+  /* Modern button styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-purple-500 text-white font-medium px-6 py-3 rounded-2xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all duration-300 hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-white text-foreground font-medium px-6 py-3 rounded-2xl border-2 border-border hover:border-primary/50 transition-all duration-300 hover:scale-105 shadow-sm;
+  }
+  
+  .btn-ghost {
+    @apply text-foreground font-medium px-6 py-3 rounded-2xl hover:bg-muted transition-all duration-300;
+  }
+  
+  /* Card styles */
+  .card-modern {
+    @apply bg-white rounded-3xl p-8 shadow-sm border border-border/50 hover:shadow-lg hover:border-primary/20 transition-all duration-300;
+  }
+  
+  .card-floating {
+    @apply bg-white rounded-3xl p-8 shadow-xl border border-border/50 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1;
+  }
+  
+  /* Text styles */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent;
+  }
+  
+  /* Illustration elements */
+  .illustration-blob {
+    @apply absolute rounded-full blur-3xl opacity-70;
+  }
+  
+  /* Playful animations */
+  .float-animation {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .bounce-subtle {
+    animation: bounce-subtle 2s ease-in-out infinite;
+  }
+  
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  /* Custom animations */
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  @keyframes bounce-subtle {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(var(--primary) / 0.3); }
+    50% { box-shadow: 0 0 30px hsl(var(--primary) / 0.5); }
+  }
+  
+  /* Responsive typography */
+  .heading-xl {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight;
+  }
+  
+  .heading-lg {
+    @apply text-2xl md:text-3xl lg:text-4xl font-bold tracking-tight;
+  }
+  
+  .heading-md {
+    @apply text-xl md:text-2xl font-semibold;
+  }
+  
+  /* Spacing utilities */
+  .section-padding {
+    @apply py-16 lg:py-24;
+  }
+  
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
   }
 }

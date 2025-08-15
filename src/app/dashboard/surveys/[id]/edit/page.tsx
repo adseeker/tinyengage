@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,9 +24,6 @@ export default function EditSurveyPage() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [thankYouMessage, setThankYouMessage] = useState('')
-  const [trackingPixel, setTrackingPixel] = useState('')
-  const [trackingScript, setTrackingScript] = useState('')
-  const [facebookPixelId, setFacebookPixelId] = useState('')
   const [upsellEnabled, setUpsellEnabled] = useState(false)
   const [upsellTitle, setUpsellTitle] = useState('')
   const [upsellDescription, setUpsellDescription] = useState('')
@@ -59,9 +57,6 @@ export default function EditSurveyPage() {
         setTitle(surveyData.title)
         setDescription(surveyData.description || '')
         setThankYouMessage(surveyData.settings.thankYouMessage || '')
-        setTrackingPixel(surveyData.settings.trackingPixel || '')
-        setTrackingScript(surveyData.settings.trackingScript || '')
-        setFacebookPixelId(surveyData.settings.facebookPixelId || '')
         
         // Upsell section
         if (surveyData.settings.upsellSection) {
@@ -97,9 +92,6 @@ export default function EditSurveyPage() {
       const updatedSettings = {
         ...survey?.settings,
         thankYouMessage: thankYouMessage.trim() || undefined,
-        trackingPixel: trackingPixel.trim() || undefined,
-        trackingScript: trackingScript.trim() || undefined,
-        facebookPixelId: facebookPixelId.trim() || undefined,
         upsellSection: upsellEnabled ? {
           enabled: true,
           title: upsellTitle,
@@ -223,65 +215,12 @@ export default function EditSurveyPage() {
               </p>
             </div>
 
-            {/* Tracking */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Track conversions</h4>
-              
-              {/* Pixel URL */}
-              <div className="space-y-2">
-                <label htmlFor="trackingPixel" className="text-sm font-medium">
-                  Tracking pixel URL
-                </label>
-                <Input
-                  id="trackingPixel"
-                  value={trackingPixel}
-                  onChange={(e) => setTrackingPixel(e.target.value)}
-                  placeholder="https://your-analytics.com/pixel.png"
-                />
-                <p className="text-xs text-gray-500">
-                  1x1 pixel image for basic conversion tracking
-                </p>
-              </div>
-
-              {/* JavaScript code */}
-              {/* Facebook Pixel ID */}
-              <div className="space-y-2">
-                <label htmlFor="facebookPixelId" className="text-sm font-medium">
-                  Facebook Pixel ID
-                </label>
-                <Input
-                  id="facebookPixelId"
-                  value={facebookPixelId}
-                  onChange={(e) => setFacebookPixelId(e.target.value)}
-                  placeholder="487547170517547"
-                />
-                <p className="text-xs text-gray-500">
-                  Enter your Facebook Pixel ID (numbers only). We'll automatically inject the tracking code.
-                </p>
-              </div>
-
-              {/* Advanced: Custom tracking script */}
-              <details className="space-y-2">
-                <summary className="text-sm font-medium cursor-pointer text-gray-700 hover:text-gray-900">
-                  Advanced: Custom tracking script
-                </summary>
-                <div className="space-y-2 pt-2">
-                  <Textarea
-                    id="trackingScript"
-                    value={trackingScript}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTrackingScript(e.target.value)}
-                    placeholder="<script>
-// Your custom tracking code here
-gtag('event', 'conversion', {'send_to': 'AW-123456/abc'});
-</script>"
-                    rows={4}
-                    className="font-mono text-xs"
-                  />
-                  <p className="text-xs text-gray-500">
-                    For advanced users: Custom JavaScript code for other analytics platforms
-                  </p>
-                </div>
-              </details>
+            {/* Note about tracking */}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                💡 <strong>Tracking is now configured at the account level!</strong> <br/>
+                Visit your <Link href="/dashboard/settings" className="underline font-medium">Settings page</Link> to configure tracking for all your surveys.
+              </p>
             </div>
 
             {/* Upsell section */}

@@ -69,11 +69,11 @@ export async function GET(
 
     const responsesByHour = await db.query(`
       SELECT 
-        EXTRACT(HOUR FROM created_at) as hour,
+        strftime('%H', created_at) as hour,
         COUNT(*) as count
       FROM responses
-      WHERE survey_id = ? AND DATE(created_at) = CURRENT_DATE
-      GROUP BY EXTRACT(HOUR FROM created_at)
+      WHERE survey_id = ? AND DATE(created_at) = DATE('now')
+      GROUP BY strftime('%H', created_at)
       ORDER BY hour ASC
     `, [surveyId])
 
@@ -81,9 +81,9 @@ export async function GET(
       SELECT 
         r.id,
         r.created_at,
+        r.metadata,
         so.label as option_label,
-        so.emoji as option_emoji,
-        (r.metadata::json->>'isBot')::boolean as is_bot
+        so.emoji as option_emoji
       FROM responses r
       JOIN survey_options so ON r.option_id = so.id
       WHERE r.survey_id = ?
@@ -116,15 +116,25 @@ export async function GET(
         responsesByDay: responsesByDay.reverse(),
         responsesByHour
       },
-      recentResponses: recentResponses.map((row: any) => ({
-        id: row.id,
-        createdAt: row.created_at,
-        option: {
-          label: row.option_label,
-          emoji: row.option_emoji
-        },
-        isBot: row.is_bot === true
-      }))
+      recentResponses: recentResponses.map((row: any) => {
+        let isBot = false
+        try {
+          const metadata = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata
+          isBot = metadata?.isBot === true
+        } catch (e) {
+          // If metadata parsing fails, assume human
+        }
+        
+        return {
+          id: row.id,
+          createdAt: row.created_at,
+          option: {
+            label: row.option_label,
+            emoji: row.option_emoji
+          },
+          isBot
+        }
+      })
     }
 
     return NextResponse.json(analytics)

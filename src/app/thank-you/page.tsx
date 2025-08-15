@@ -2,13 +2,12 @@
 
 import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import Image from 'next/image'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Survey } from '@/types'
-import { generateFacebookPixelScript } from '@/lib/tracking'
+import { generateAllTrackingScripts, type TrackingConfig } from '@/lib/tracking'
 
 function ThankYouContent() {
   const searchParams = useSearchParams()
@@ -22,45 +21,68 @@ function ThankYouContent() {
   const [isSubmittingFollowUp, setIsSubmittingFollowUp] = useState(false)
   const [followUpSubmitted, setFollowUpSubmitted] = useState(false)
 
-  // Fetch survey data to get enhanced settings
+  // Fetch survey data and user settings for tracking
   useEffect(() => {
     if (surveyId) {
-      fetch(`/api/surveys/${surveyId}/public`)
-        .then(res => res.json())
-        .then(data => {
-          setSurvey(data)
-          
-          // Inject tracking scripts - prioritize Facebook Pixel ID over custom script
-          let scriptToInject = ''
-          
-          if (data.settings?.facebookPixelId) {
-            // Generate Facebook Pixel script automatically
-            try {
-              scriptToInject = generateFacebookPixelScript(data.settings.facebookPixelId)
-            } catch (error) {
-              console.error('Invalid Facebook Pixel ID:', error)
-            }
-          } else if (data.settings?.trackingScript) {
-            // Fall back to custom tracking script for backward compatibility
-            let scriptContent = data.settings.trackingScript.trim()
-            
-            // Remove script tags if they exist (handle both cases: with and without tags)
-            const scriptTagRegex = /<script[^>]*>([\s\S]*?)<\/script>/gi
-            const match = scriptTagRegex.exec(scriptContent)
-            if (match) {
-              scriptContent = match[1] // Extract content between script tags
-            }
-            
-            scriptToInject = scriptContent
+      // Fetch both survey data and user settings
+      Promise.all([
+        fetch(`/api/surveys/${surveyId}/public`).then(res => res.json()),
+        fetch(`/api/surveys/${surveyId}/user-settings`).then(res => {
+          if (res.ok) {
+            return res.json()
           }
+          return { trackingSettings: {} } // Default if no settings
+        })
+      ])
+        .then(([surveyData, userSettings]) => {
+          setSurvey(surveyData)
           
-          // Inject the script into the page
-          if (scriptToInject) {
-            const script = document.createElement('script')
-            script.type = 'text/javascript'
-            script.text = scriptToInject
-            document.head.appendChild(script)
+          // Generate all tracking scripts based on user-level configuration
+          const trackingConfig: TrackingConfig = {
+            facebookPixelId: userSettings.trackingSettings?.facebookPixelId,
+            gtmContainerId: userSettings.trackingSettings?.gtmContainerId,
+            ga4MeasurementId: userSettings.trackingSettings?.ga4MeasurementId,
+            googleAdsConversionId: userSettings.trackingSettings?.googleAdsConversionId,
+            googleAdsConversionLabel: userSettings.trackingSettings?.googleAdsConversionLabel,
           }
+
+          try {
+            const { headScripts, noscriptElements, gtmScripts } = generateAllTrackingScripts(trackingConfig)
+            
+            // Inject Google Tag Manager scripts first (need to load gtag library)
+            if (gtmScripts && gtmScripts.length > 0) {
+              gtmScripts.forEach(scriptTag => {
+                const tempDiv = document.createElement('div')
+                tempDiv.innerHTML = scriptTag.trim()
+                const scriptElement = tempDiv.firstElementChild as HTMLScriptElement
+                if (scriptElement) {
+                  document.head.appendChild(scriptElement)
+                }
+              })
+            }
+
+            // Inject head scripts
+            if (headScripts.length > 0) {
+              const combinedScript = headScripts.join('\n\n')
+              const scriptElement = document.createElement('script')
+              scriptElement.text = combinedScript
+              document.head.appendChild(scriptElement)
+            }
+
+            // Inject noscript elements
+            if (noscriptElements.length > 0) {
+              noscriptElements.forEach(noscriptHtml => {
+                const noscriptElement = document.createElement('noscript')
+                noscriptElement.innerHTML = noscriptHtml
+                document.body.appendChild(noscriptElement)
+              })
+            }
+
+          } catch (error) {
+            console.error('Error injecting tracking scripts:', error)
+          }
+
+          // Note: Custom tracking scripts are no longer supported - use Settings page instead
         })
         .catch(err => console.error('Failed to fetch survey:', err))
     }
@@ -90,17 +112,6 @@ function ThankYouContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      {/* Tracking Pixel */}
-      {survey?.settings?.trackingPixel && (
-        <Image 
-          src={survey.settings.trackingPixel} 
-          alt="" 
-          width={1}
-          height={1}
-          style={{ position: 'absolute', top: 0, left: 0 }} 
-        />
-      )}
-      
       <div className="w-full max-w-md space-y-6">
         {/* Main Thank You Card */}
         <Card className="text-center">

@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
 interface Survey {
@@ -79,154 +78,238 @@ export default function AnalyticsPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="flex items-center justify-center py-16">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading your analytics...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Analytics Overview</h1>
-        <p className="mt-2 text-gray-600">
-          Performance metrics across all your surveys
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="heading-xl mb-4">
+          <span className="text-gradient">Analytics</span> Overview
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Deep dive into your survey performance. Track engagement, measure success, and discover insights that matter.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Total Surveys</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{metrics.totalSurveys}</div>
-          </CardContent>
-        </Card>
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="card-modern group hover:scale-105 transition-transform">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-accent-pink rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="text-2xl">📋</span>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-foreground">{metrics.totalSurveys}</div>
+              <div className="text-sm text-muted-foreground">Total Surveys</div>
+            </div>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-accent-pink rounded-full" style={{width: `${Math.min(metrics.totalSurveys * 20, 100)}%`}}></div>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Total Responses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-primary">{metrics.totalResponses}</div>
-          </CardContent>
-        </Card>
+        <div className="card-modern group hover:scale-105 transition-transform">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-accent-blue rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="text-2xl">💬</span>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-primary">{metrics.totalResponses}</div>
+              <div className="text-sm text-muted-foreground">Total Responses</div>
+            </div>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-accent-blue rounded-full" style={{width: `${Math.min(metrics.totalResponses * 2, 100)}%`}}></div>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Avg Responses</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-success">{metrics.averageResponseRate}</div>
-            <div className="text-xs text-gray-500">per survey</div>
-          </CardContent>
-        </Card>
+        <div className="card-modern group hover:scale-105 transition-transform">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-accent-green rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="text-2xl">📊</span>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-success">{metrics.averageResponseRate}</div>
+              <div className="text-sm text-muted-foreground">Avg per Survey</div>
+            </div>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-accent-green rounded-full" style={{width: `${Math.min(metrics.averageResponseRate * 10, 100)}%`}}></div>
+          </div>
+        </div>
         
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">This Month</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{metrics.thisMonthResponses}</div>
-            <div className="text-xs text-gray-500">responses</div>
-          </CardContent>
-        </Card>
+        <div className="card-modern group hover:scale-105 transition-transform">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-accent-purple rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+              <span className="text-2xl">🚀</span>
+            </div>
+            <div className="text-right">
+              <div className="text-3xl font-bold text-primary">{metrics.thisMonthResponses}</div>
+              <div className="text-sm text-muted-foreground">This Month</div>
+            </div>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <div className="h-full bg-accent-purple rounded-full" style={{width: `${Math.min(metrics.thisMonthResponses * 5, 100)}%`}}></div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Survey Performance</CardTitle>
-            <CardDescription>Response count by survey</CardDescription>
-          </CardHeader>
-          <CardContent>
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Survey Performance Chart */}
+        <div className="card-modern">
+          <div className="flex items-center mb-6">
+            <div className="w-10 h-10 bg-accent-orange rounded-2xl flex items-center justify-center mr-4">
+              <span className="text-lg">📈</span>
+            </div>
+            <div>
+              <h2 className="heading-md">Survey Performance</h2>
+              <p className="text-muted-foreground">Response count by survey</p>
+            </div>
+          </div>
+          
+          <div className="bg-muted/20 rounded-2xl p-4">
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={surveys.slice(0, 10)}>
-                <CartesianGrid strokeDasharray="3 3" />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis 
                   dataKey="title" 
-                  tick={{ fontSize: 12 }}
+                  tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }}
                   tickFormatter={(value) => value.length > 15 ? value.slice(0, 15) + '...' : value}
                 />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="responseCount" fill="#2563eb" />
+                <YAxis tick={{ fontSize: 12, fill: 'hsl(var(--muted-foreground))' }} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: 'hsl(var(--card))', 
+                    border: '1px solid hsl(var(--border))',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 40px hsl(var(--muted-foreground) / 0.1)'
+                  }} 
+                />
+                <Bar dataKey="responseCount" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Survey Types</CardTitle>
-            <CardDescription>Distribution of survey types</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {['emoji', 'rating', 'binary'].map((type) => {
-                const count = surveys.filter(s => s.type === type).length
-                const percentage = surveys.length > 0 ? Math.round(count / surveys.length * 100) : 0
-                
-                return (
-                  <div key={type} className="flex items-center justify-between">
-                    <span className="text-sm font-medium">{getTypeLabel(type)}</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-20 bg-gray-200 rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full" 
-                          style={{ width: `${percentage}%` }}
-                        ></div>
-                      </div>
-                      <span className="text-sm text-gray-600 w-8">{count}</span>
+        {/* Survey Types Distribution */}
+        <div className="card-modern">
+          <div className="flex items-center mb-6">
+            <div className="w-10 h-10 bg-accent-yellow rounded-2xl flex items-center justify-center mr-4">
+              <span className="text-lg">🎯</span>
+            </div>
+            <div>
+              <h2 className="heading-md">Survey Types</h2>
+              <p className="text-muted-foreground">Distribution of survey types</p>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
+            {['emoji', 'rating', 'binary'].map((type) => {
+              const count = surveys.filter(s => s.type === type).length
+              const percentage = surveys.length > 0 ? Math.round(count / surveys.length * 100) : 0
+              const colors = { emoji: 'bg-accent-pink', rating: 'bg-accent-blue', binary: 'bg-accent-green' }
+              
+              return (
+                <div key={type} className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-foreground">{getTypeLabel(type)}</span>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm font-semibold text-foreground w-12 text-right">{count}</span>
+                      <span className="text-xs text-muted-foreground w-12 text-right">{percentage}%</span>
                     </div>
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                  <div className="h-2 bg-muted rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${colors[type as keyof typeof colors]}`}
+                      style={{ width: `${percentage}%` }}
+                    ></div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Recent Surveys</CardTitle>
-              <CardDescription>Your latest survey campaigns</CardDescription>
+      {/* Recent Surveys */}
+      <div className="card-modern">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h2 className="heading-md">Recent Surveys</h2>
+            <p className="text-muted-foreground">Your latest survey campaigns</p>
+          </div>
+          <Link href="/dashboard/surveys">
+            <Button variant="outline" size="sm" className="btn-secondary">
+              View All →
+            </Button>
+          </Link>
+        </div>
+        
+        {surveys.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="w-16 h-16 bg-muted rounded-3xl flex items-center justify-center mx-auto mb-6">
+              <span className="text-2xl text-muted-foreground">📋</span>
             </div>
-            <Link href="/dashboard/surveys">
-              <Button variant="outline" size="sm">View All</Button>
+            <h3 className="heading-md mb-4">No surveys yet</h3>
+            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+              Get started by creating your first survey and start collecting amazing feedback
+            </p>
+            <Link href="/dashboard/surveys/new">
+              <Button className="btn-primary">
+                <span className="mr-2">✨</span>
+                Create Your First Survey
+              </Button>
             </Link>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+        ) : (
+          <div className="space-y-3">
             {surveys.slice(0, 5).map((survey) => (
-              <div key={survey.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
-                <div className="flex items-center space-x-3">
-                  <div className="text-sm font-medium">{survey.title}</div>
-                  <span className="text-xs bg-gray-100 px-2 py-1 rounded-full">
-                    {getTypeLabel(survey.type)}
-                  </span>
-                </div>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <span>{survey.responseCount} responses</span>
-                  <span>{new Date(survey.createdAt).toLocaleDateString()}</span>
-                  <Link href={`/dashboard/surveys/${survey.id}`}>
-                    <Button size="sm" variant="outline">View</Button>
-                  </Link>
+              <div key={survey.id} className="p-4 rounded-2xl border border-border hover:border-primary/20 hover:shadow-lg transition-all group">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary to-purple-500 rounded-2xl flex items-center justify-center text-white font-semibold group-hover:scale-110 transition-transform">
+                      {getTypeLabel(survey.type).charAt(0)}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                        {survey.title}
+                      </h4>
+                      <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                        <span className="px-2 py-1 bg-muted rounded-lg text-xs font-medium">
+                          {getTypeLabel(survey.type)}
+                        </span>
+                        <span>•</span>
+                        <span>{new Date(survey.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-6">
+                    <div className="text-center">
+                      <div className="text-2xl font-bold text-primary">{survey.responseCount}</div>
+                      <div className="text-xs text-muted-foreground">responses</div>
+                    </div>
+                    <Link href={`/dashboard/surveys/${survey.id}`}>
+                      <Button size="sm" className="btn-primary">
+                        View Details
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
-            {surveys.length === 0 && (
-              <div className="text-center py-8 text-gray-500">
-                No surveys created yet. <Link href="/dashboard/surveys/new" className="text-primary hover:underline">Create your first survey</Link>
-              </div>
-            )}
           </div>
-        </CardContent>
-      </Card>
+        )}
+      </div>
     </div>
   )
 }

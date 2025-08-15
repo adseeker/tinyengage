@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -21,9 +22,6 @@ export default function NewSurveyPage() {
   
   // Enhanced thank you page settings
   const [thankYouMessage, setThankYouMessage] = useState('')
-  const [trackingPixel, setTrackingPixel] = useState('')
-  const [trackingScript, setTrackingScript] = useState('')
-  const [facebookPixelId, setFacebookPixelId] = useState('')
   const [upsellEnabled, setUpsellEnabled] = useState(false)
   const [upsellTitle, setUpsellTitle] = useState('')
   const [upsellDescription, setUpsellDescription] = useState('')
@@ -56,7 +54,6 @@ export default function NewSurveyPage() {
 
     setIsLoading(true)
     try {
-      const template = EMAIL_TEMPLATES[selectedTemplate]
       const surveyType = selectedTemplate === 'NPS' ? 'rating' : 
                         selectedTemplate === 'THUMBS' ? 'binary' : 'emoji'
 
@@ -69,9 +66,6 @@ export default function NewSurveyPage() {
           requireRecipientId: false,
           botDetectionEnabled: true,
           thankYouMessage: thankYouMessage.trim() || undefined,
-          trackingPixel: trackingPixel.trim() || undefined,
-          trackingScript: trackingScript.trim() || undefined,
-          facebookPixelId: facebookPixelId.trim() || undefined,
           upsellSection: upsellEnabled ? {
             enabled: true,
             title: upsellTitle,
@@ -111,23 +105,33 @@ export default function NewSurveyPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create New Survey</h1>
-        <p className="mt-2 text-gray-600">
-          Choose a template and customize your survey
+    <div className="max-w-5xl mx-auto space-y-8">
+      {/* Header */}
+      <div className="text-center">
+        <h1 className="heading-xl mb-4">
+          Create your <span className="text-gradient">perfect</span> survey
+        </h1>
+        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+          Choose a template and customize your survey. Create something your audience will love to interact with.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-8">
-        <Card>
-          <CardHeader>
-            <CardTitle>Survey Details</CardTitle>
-            <CardDescription>Basic information about your survey</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        {/* Survey Details */}
+        <div className="card-modern">
+          <div className="flex items-center mb-6">
+            <div className="w-10 h-10 bg-accent-pink rounded-2xl flex items-center justify-center mr-4">
+              <span className="text-lg">✨</span>
+            </div>
+            <div>
+              <h2 className="heading-md">Survey Details</h2>
+              <p className="text-muted-foreground">Basic information about your survey</p>
+            </div>
+          </div>
+          
+          <div className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="title" className="text-sm font-medium">
+              <label htmlFor="title" className="text-sm font-medium text-foreground block">
                 Survey Title
               </label>
               <Input
@@ -136,11 +140,12 @@ export default function NewSurveyPage() {
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="How was your experience?"
                 required
+                className="h-12 rounded-xl border-2 border-border focus:border-primary/50 transition-colors"
               />
             </div>
             
             <div className="space-y-2">
-              <label htmlFor="description" className="text-sm font-medium">
+              <label htmlFor="description" className="text-sm font-medium text-foreground block">
                 Description (optional)
               </label>
               <Input
@@ -148,50 +153,65 @@ export default function NewSurveyPage() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Help us improve by sharing your feedback"
+                className="h-12 rounded-xl border-2 border-border focus:border-primary/50 transition-colors"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Survey Template</CardTitle>
-            <CardDescription>Choose from pre-built templates</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {Object.entries(EMAIL_TEMPLATES).map(([key, template]) => (
-                <div
-                  key={key}
-                  className={`border rounded-lg p-4 cursor-pointer transition-colors ${
-                    selectedTemplate === key
-                      ? 'border-primary bg-primary/5'
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => handleTemplateSelect(key as keyof typeof EMAIL_TEMPLATES)}
-                >
-                  <h3 className="font-medium mb-2">{template.name}</h3>
-                  <div className="flex flex-wrap gap-2">
+        {/* Survey Template */}
+        <div className="card-modern">
+          <div className="flex items-center mb-6">
+            <div className="w-10 h-10 bg-accent-blue rounded-2xl flex items-center justify-center mr-4">
+              <span className="text-lg">🎨</span>
+            </div>
+            <div>
+              <h2 className="heading-md">Survey Template</h2>
+              <p className="text-muted-foreground">Choose from pre-built templates</p>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {Object.entries(EMAIL_TEMPLATES).map(([key, template]) => (
+              <div
+                key={key}
+                className={`p-6 rounded-2xl cursor-pointer transition-all border-2 group ${
+                  selectedTemplate === key
+                    ? 'border-primary bg-primary/10 shadow-lg scale-105'
+                      : 'border-border hover:border-border/80 hover:scale-102'
+                }`}
+                onClick={() => handleTemplateSelect(key as keyof typeof EMAIL_TEMPLATES)}
+              >
+                <div className="text-center">
+                  <h3 className="font-semibold mb-3 text-foreground group-hover:text-primary transition-colors">
+                    {template.name}
+                  </h3>
+                  <div className="flex justify-center flex-wrap gap-2 mb-3">
                     {template.options.slice(0, 5).map((option, index) => (
                       <span
                         key={index}
-                        className="text-lg"
+                        className="text-2xl group-hover:scale-110 transition-transform"
                         title={option.label}
                       >
                         {'emoji' in option ? option.emoji : option.label}
                       </span>
                     ))}
                     {template.options.length > 5 && (
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-muted-foreground">
                         +{template.options.length - 5} more
                       </span>
                     )}
                   </div>
+                  {selectedTemplate === key && (
+                    <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center mx-auto">
+                      <span className="text-white text-sm">✓</span>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+            ))}
+          </div>
+        </div>
 
         <Card>
           <CardHeader>
@@ -247,64 +267,12 @@ export default function NewSurveyPage() {
               </p>
             </div>
 
-            {/* Tracking */}
-            <div className="space-y-4">
-              <h4 className="text-sm font-medium">Track conversions</h4>
-              
-              {/* Pixel URL */}
-              <div className="space-y-2">
-                <label htmlFor="trackingPixel" className="text-sm font-medium">
-                  Tracking pixel URL
-                </label>
-                <Input
-                  id="trackingPixel"
-                  value={trackingPixel}
-                  onChange={(e) => setTrackingPixel(e.target.value)}
-                  placeholder="https://your-analytics.com/pixel.png"
-                />
-                <p className="text-xs text-gray-500">
-                  1x1 pixel image for basic conversion tracking
-                </p>
-              </div>
-
-              {/* Facebook Pixel ID */}
-              <div className="space-y-2">
-                <label htmlFor="facebookPixelId" className="text-sm font-medium">
-                  Facebook Pixel ID
-                </label>
-                <Input
-                  id="facebookPixelId"
-                  value={facebookPixelId}
-                  onChange={(e) => setFacebookPixelId(e.target.value)}
-                  placeholder="487547170517547"
-                />
-                <p className="text-xs text-gray-500">
-                  Enter your Facebook Pixel ID (numbers only). We'll automatically inject the tracking code.
-                </p>
-              </div>
-
-              {/* Advanced: Custom tracking script */}
-              <details className="space-y-2">
-                <summary className="text-sm font-medium cursor-pointer text-gray-700 hover:text-gray-900">
-                  Advanced: Custom tracking script
-                </summary>
-                <div className="space-y-2 pt-2">
-                  <Textarea
-                    id="trackingScript"
-                    value={trackingScript}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setTrackingScript(e.target.value)}
-                    placeholder="<script>
-// Your custom tracking code here
-gtag('event', 'conversion', {'send_to': 'AW-123456/abc'});
-</script>"
-                    rows={4}
-                    className="font-mono text-xs"
-                  />
-                  <p className="text-xs text-gray-500">
-                    For advanced users: Custom JavaScript code for other analytics platforms
-                  </p>
-                </div>
-              </details>
+            {/* Note about tracking */}
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                💡 <strong>Tracking is now configured at the account level!</strong> <br/>
+                Visit your <Link href="/dashboard/settings" className="underline font-medium">Settings page</Link> to configure tracking for all your surveys.
+              </p>
             </div>
 
             {/* Upsell section */}
@@ -436,16 +404,32 @@ gtag('event', 'conversion', {'send_to': 'AW-123456/abc'});
           </CardContent>
         </Card>
 
-        <div className="flex justify-between">
+        {/* Action Buttons */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-8 border-t border-border">
           <Button
             type="button"
             variant="outline"
             onClick={() => router.back()}
+            className="btn-secondary w-full sm:w-auto"
           >
-            Cancel
+            ← Cancel
           </Button>
-          <Button type="submit" disabled={isLoading || !title.trim()}>
-            {isLoading ? 'Creating...' : 'Create Survey'}
+          <Button 
+            type="submit" 
+            disabled={isLoading || !title.trim()}
+            className="btn-primary w-full sm:w-auto px-8 py-3"
+          >
+            {isLoading ? (
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Creating...</span>
+              </div>
+            ) : (
+              <>
+                <span className="mr-2">✨</span>
+                Create Survey
+              </>
+            )}
           </Button>
         </div>
       </form>

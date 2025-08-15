@@ -6,6 +6,28 @@ export interface User {
   subscriptionTier: 'free' | 'starter' | 'pro' | 'enterprise'
 }
 
+export interface UserSettings {
+  id: string
+  userId: string
+  trackingSettings?: TrackingSettings
+  notificationSettings?: NotificationSettings
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface TrackingSettings {
+  facebookPixelId?: string
+  gtmContainerId?: string
+  ga4MeasurementId?: string
+  googleAdsConversionId?: string
+  googleAdsConversionLabel?: string
+}
+
+export interface NotificationSettings {
+  emailNotifications: boolean
+  webhookNotifications: boolean
+}
+
 export interface Survey {
   id: string
   title: string
@@ -32,10 +54,6 @@ export interface SurveySettings {
   thankYouMessage?: string
   redirectUrl?: string
   expiresAt?: Date
-  // Enhanced thank you page settings
-  trackingPixel?: string
-  trackingScript?: string
-  facebookPixelId?: string // New: Simple Facebook Pixel ID field
   upsellSection?: {
     enabled: boolean
     title: string
