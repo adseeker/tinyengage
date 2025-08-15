@@ -85,7 +85,7 @@ export async function GET(
         so.label as option_label,
         so.emoji as option_emoji
       FROM responses r
-      JOIN survey_options so ON r.option_id = so.id
+      LEFT JOIN survey_options so ON r.option_id = so.id
       WHERE r.survey_id = ?
       ORDER BY r.created_at DESC
       LIMIT 50
