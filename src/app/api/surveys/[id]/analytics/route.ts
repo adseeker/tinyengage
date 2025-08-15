@@ -38,8 +38,8 @@ export async function GET(
     const humanResponses = await db.get(`
       SELECT COUNT(*) as count 
       FROM responses r 
-      JOIN bot_scores bs ON r.id = bs.response_id 
-      WHERE r.survey_id = ? AND bs.score < 50
+      LEFT JOIN bot_scores bs ON r.id = bs.response_id 
+      WHERE r.survey_id = ? AND (bs.score < 50 OR bs.score IS NULL)
     `, [surveyId])
 
     const responsesByOption = await db.query(`
