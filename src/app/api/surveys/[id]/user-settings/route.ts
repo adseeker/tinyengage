@@ -4,15 +4,18 @@ import { db, initializeDatabase } from '@/lib/database'
 
 initializeDatabase()
 
-export async function GET(
-  _req: Request,                                   // use the Web Request type
-  { params }: { params: { id: string } }          // context with params
-) {
+export async function GET(request: Request) {
   try {
-    const surveyId = params.id
+    // /api/surveys/:id/user-settings
+    const url = new URL(request.url)
+    const m = url.pathname.match(/\/api\/surveys\/([^/]+)\/user-settings\/?$/)
+    const surveyId = m?.[1]
+    if (!surveyId) {
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 })
+    }
 
     const survey = await db.get(
-      `SELECT user_id FROM surveys WHERE id = ?`,
+      'SELECT user_id FROM surveys WHERE id = ?',
       [surveyId]
     )
     if (!survey) {
@@ -28,16 +31,22 @@ export async function GET(
     if (!settings) {
       return NextResponse.json({
         trackingSettings: {},
-        notificationSettings: { emailNotifications: true, webhookNotifications: false }
+        notificationSettings: {
+          emailNotifications: true,
+          webhookNotifications: false,
+        },
       })
     }
 
-    const trackingSettings =
-      settings.tracking_settings ? JSON.parse(settings.tracking_settings) : {}
-    const notificationSettings =
-      settings.notification_settings
-        ? JSON.parse(settings.notification_settings)
-        : { emailNotifications: true, webhookNotifications: false }
+    const trackingSettings = settings.tracking_settings
+      ? JSON.parse(settings.tracking_settings)
+      : {}
+    const notificationSettings = settings.notification_settings
+      ? JSON.parse(settings.notification_settings)
+      : {
+          emailNotifications: true,
+          webhookNotifications: false,
+        }
 
     return NextResponse.json({ trackingSettings, notificationSettings })
   } catch (err) {
