@@ -143,8 +143,6 @@ export async function GET(
   } catch (error) {
     console.error('Analytics error:', error)
     console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
-    console.error('Survey ID:', surveyId)
-    console.error('User ID:', payload?.userId)
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
