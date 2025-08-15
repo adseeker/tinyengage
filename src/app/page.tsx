@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { trackEvent } from '@/lib/gtm'
 
 export default function Home() {
   return (
@@ -21,10 +22,18 @@ export default function Home() {
             <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">Features</a>
             <a href="#how-it-works" className="text-muted-foreground hover:text-foreground transition-colors">How it works</a>
             <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">Pricing</a>
-            <Link href="/auth/login" className="btn-ghost">
+            <Link 
+              href="/auth/login" 
+              className="btn-ghost"
+              onClick={() => trackEvent.buttonClick('Sign In', 'Navigation')}
+            >
               Sign In
             </Link>
-            <Link href="/auth/register" className="btn-primary">
+            <Link 
+              href="/auth/register" 
+              className="btn-primary"
+              onClick={() => trackEvent.buttonClick('Get Started Free', 'Navigation')}
+            >
               Get Started Free
             </Link>
           </div>
@@ -45,7 +54,11 @@ export default function Home() {
               Turn your newsletters into engagement engines. Embed interactive survey buttons that your subscribers can click without leaving their inbox.
             </p>
             <div className="flex flex-col justify-center items-center gap-3">
-              <Link href="/auth/register" className="btn-primary text-lg px-8 py-4">
+              <Link 
+                href="/auth/register" 
+                className="btn-primary text-lg px-8 py-4"
+                onClick={() => trackEvent.buttonClick('Create Free Survey', 'Hero Section')}
+              >
                 Create a free survey →
               </Link>
               <p className="text-sm text-muted-foreground">No credit card required.</p>
@@ -57,11 +70,30 @@ export default function Home() {
             <div className="card-floating bg-white p-8 mx-4">
               <h3 className="text-lg font-semibold mb-6">How was your experience today?</h3>
               <div className="flex justify-center space-x-4 mb-6">
-                <button className="w-16 h-16 bg-accent-pink rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle">😡</button>
-                <button className="w-16 h-16 bg-accent-yellow rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" style={{animationDelay: '0.5s'}}>😐</button>
-                <button className="w-16 h-16 bg-accent-green rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" style={{animationDelay: '1s'}}>🙂</button>
-                <button className="w-16 h-16 bg-accent-blue rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" style={{animationDelay: '1.5s'}}>😃</button>
-                <button className="w-16 h-16 bg-accent-purple rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" style={{animationDelay: '2s'}}>🥰</button>
+                <button 
+                  className="w-16 h-16 bg-accent-pink rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle"
+                  onClick={() => trackEvent.buttonClick('Demo Survey - Angry', 'Demo')}
+                >😡</button>
+                <button 
+                  className="w-16 h-16 bg-accent-yellow rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" 
+                  style={{animationDelay: '0.5s'}}
+                  onClick={() => trackEvent.buttonClick('Demo Survey - Neutral', 'Demo')}
+                >😐</button>
+                <button 
+                  className="w-16 h-16 bg-accent-green rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" 
+                  style={{animationDelay: '1s'}}
+                  onClick={() => trackEvent.buttonClick('Demo Survey - Happy', 'Demo')}
+                >🙂</button>
+                <button 
+                  className="w-16 h-16 bg-accent-blue rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" 
+                  style={{animationDelay: '1.5s'}}
+                  onClick={() => trackEvent.buttonClick('Demo Survey - Very Happy', 'Demo')}
+                >😃</button>
+                <button 
+                  className="w-16 h-16 bg-accent-purple rounded-full text-2xl hover:scale-110 transition-transform cursor-pointer bounce-subtle" 
+                  style={{animationDelay: '2s'}}
+                  onClick={() => trackEvent.buttonClick('Demo Survey - Love', 'Demo')}
+                >🥰</button>
               </div>
               <p className="text-sm text-muted-foreground">One click. No redirects. Instant feedback.</p>
             </div>
@@ -244,7 +276,11 @@ export default function Home() {
             Join thousands of creators who are already collecting better feedback with beautiful, accessible surveys.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/auth/register" className="btn-primary text-lg px-12 py-4">
+            <Link 
+              href="/auth/register" 
+              className="btn-primary text-lg px-12 py-4"
+              onClick={() => trackEvent.buttonClick('Create First Survey', 'Bottom CTA')}
+            >
               Create your first survey
             </Link>
             <p className="text-sm text-muted-foreground">100% free to use. No credit card required.</p>
