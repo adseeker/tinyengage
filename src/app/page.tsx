@@ -48,7 +48,7 @@ export default function Home() {
               <Link href="/auth/register" className="btn-primary text-lg px-8 py-4">
                 Create a free survey →
               </Link>
-              <p className="text-sm text-muted-foreground">No signup required</p>
+              <p className="text-sm text-muted-foreground">100% free of charge</p>
             </div>
           </div>
 
@@ -86,9 +86,9 @@ export default function Home() {
               <div className="w-14 h-14 bg-accent-pink rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <span className="text-2xl">⚡</span>
               </div>
-              <h3 className="heading-md mb-4">Just start typing</h3>
+              <h3 className="heading-md mb-4">Template-based surveys</h3>
               <p className="text-muted-foreground leading-relaxed">
-                TinyEngagement is a new type of online survey builder that works like a text document. Just start typing on the page and insert blocks same as Notion.
+                Choose from pre-built survey templates and customize them to match your brand. Create emoji reactions, star ratings, or custom feedback forms in minutes.
               </p>
             </div>
             
@@ -96,9 +96,9 @@ export default function Home() {
               <div className="w-14 h-14 bg-accent-blue rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
                 <span className="text-2xl">🔒</span>
               </div>
-              <h3 className="heading-md mb-4">Privacy-friendly survey builder</h3>
+              <h3 className="heading-md mb-4">Flexible surveys</h3>
               <p className="text-muted-foreground leading-relaxed">
-                Your data privacy and security are our top priorities. We are GDPR compliant and treat your data with care and confidentiality.
+                Deploy your surveys anywhere your Email Service Provider supports HTML blocks. Works with Mailchimp, ConvertKit, Klaviyo, and more.
               </p>
             </div>
             
@@ -247,7 +247,7 @@ export default function Home() {
             <Link href="/auth/register" className="btn-primary text-lg px-12 py-4">
               Create your first survey
             </Link>
-            <p className="text-sm text-muted-foreground">Free forever. No credit card required.</p>
+            <p className="text-sm text-muted-foreground">100% free to use. No credit card required.</p>
           </div>
         </div>
       </section>
