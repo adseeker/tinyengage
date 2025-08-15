@@ -6,26 +6,31 @@ const db = new Database('./quickpoll.db');
 
 console.log('🔐 Running security tests...\n');
 
-// Create two test users
-const user1Id = randomUUID();
-const user2Id = randomUUID();
-const password = 'password123';
-const hashedPassword = bcrypt.hashSync(password, 12);
+console.log('1. Getting existing test users...');
+const existingUsers = db.prepare("SELECT id, email FROM users WHERE email IN ('user1@test.com', 'user2@test.com')").all();
 
-console.log('1. Creating two test users...');
-try {
-  const insertUser = db.prepare(`
-    INSERT INTO users (id, email, name, password_hash, subscription_tier)
-    VALUES (?, ?, ?, ?, ?)
-  `);
-  
-  insertUser.run(user1Id, 'user1@test.com', 'User 1', hashedPassword, 'free');
-  insertUser.run(user2Id, 'user2@test.com', 'User 2', hashedPassword, 'free');
-  console.log('✅ Users created successfully');
-} catch (error) {
-  if (error.message.includes('UNIQUE constraint failed')) {
-    console.log('⚠️ Users already exist, continuing...');
-  } else {
+let user1Id, user2Id;
+if (existingUsers.length === 2) {
+  user1Id = existingUsers[0].id;
+  user2Id = existingUsers[1].id;
+  console.log('✅ Using existing test users');
+} else {
+  // Create new users if they don't exist
+  user1Id = randomUUID();
+  user2Id = randomUUID();
+  const password = 'password123';
+  const hashedPassword = bcrypt.hashSync(password, 12);
+
+  try {
+    const insertUser = db.prepare(`
+      INSERT INTO users (id, email, name, password_hash, subscription_tier)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+    
+    insertUser.run(user1Id, 'user1@test.com', 'User 1', hashedPassword, 'free');
+    insertUser.run(user2Id, 'user2@test.com', 'User 2', hashedPassword, 'free');
+    console.log('✅ Users created successfully');
+  } catch (error) {
     throw error;
   }
 }
