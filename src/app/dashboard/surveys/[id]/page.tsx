@@ -77,6 +77,8 @@ export default function SurveyDetailsPage() {
       if (response.ok) {
         const data = await response.json()
         setAnalytics(data)
+      } else {
+        console.error('Analytics API error:', response.status, await response.text())
       }
     } catch (error) {
       console.error('Failed to fetch analytics:', error)
